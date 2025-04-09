@@ -6,11 +6,11 @@ terraform {
   backend "azurerm" {
       use_azuread_auth = true
       tenant_id = "84f1e4ea-8554-43e1-8709-f0b8589ea118"
-      storage_account_name = "jenkinsmaster9517" # ??????
-      container_name = ""
+      storage_account_name = "jenkinsmaster5681" # ??????
+      container_name = "petclinicimage"
       key   = "prod.terraform.tfstate"
-      client_id = ""
-      client_secret = ""
+      client_id = var.azure_client_id
+      client_secret = var.azure_client_secret
   }
 }
 

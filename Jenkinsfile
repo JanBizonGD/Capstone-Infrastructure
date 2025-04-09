@@ -1,22 +1,27 @@
 pipeline {
     agent any
+    environment {
+        AZURE_CRED = credentials('azure-cred')
+    }
     stages {
         stage('Loggin'){
             steps {
                 sh 'echo INIT'
-                sh 'terraform init -backend-config="state.config" --auto-approve'
+                sh 'export TF_VAR_azure_client_id=$AZURE_CRED_USR'
+                sh 'export TF_VAR_azure_client_secret=$AZURE_CRED_PSW'
+                sh 'terraform init -backend-config="state.config"'
             }
         }
         stage('Formatting'){
             steps {
                 sh 'echo FORMATTING'
-                sh 'terraform fmt -diff --auto-approve'
+                sh 'terraform fmt -diff'
             }
         }
         stage('Validation and Scanning'){
             steps {
                 sh 'echo VALIDATION AND SCANNING'
-                sh 'terraform validate --auto-approve'
+                sh 'terraform validate'
             }
         }
         stage('Plan'){
