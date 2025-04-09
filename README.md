@@ -3,3 +3,4 @@
 #### It requires create inside Jenkins credentials (at least for now).
 
 **It is also important to edit Jenkinsfile with correct storage account name**
+**Change subscription ID and tenant ID**
