@@ -1,8 +1,5 @@
 # Infrastructure for Capstone project
 
-#### It requires state.config with credentials:
+#### It requires create inside Jenkins credentials (at least for now).
 
-```
-client_id = "573cfe..........."
-client_secret = "w5I8..........."
-```
+**It is also important to edit Jenkinsfile with correct storage account name**

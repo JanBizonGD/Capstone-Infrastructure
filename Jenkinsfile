@@ -9,7 +9,8 @@ pipeline {
                 sh 'echo INIT'
                 sh 'export TF_VAR_azure_client_id=$AZURE_CRED_USR'
                 sh 'export TF_VAR_azure_client_secret=$AZURE_CRED_PSW'
-                sh 'terraform init -backend-config="state.config"'
+                sh 'export TF_VAR_azure_storage_account="jenkinsmaster5681"'
+                sh 'terraform init'
             }
         }
         stage('Formatting'){
