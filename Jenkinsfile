@@ -9,7 +9,7 @@ pipeline {
                 sh 'echo INIT'
                 sh 'export ARM_CLIENT_ID=$AZURE_CRED_USR'
                 sh 'export ARM_CLIENT_SECRET=$AZURE_CRED_PSW'
-                sh 'terraform init -backend-config="azure_storage_account=jenkinsmaster5681"'
+                sh 'terraform init -backend-config="storage_account_name=jenkinsmaster5681"'
             }
         }
         stage('Formatting'){
