@@ -9,8 +9,8 @@ terraform {
       storage_account_name = var.azure_storage_account
       container_name = "petclinicimage"
       key   = "prod.terraform.tfstate"
-      client_id = var.azure_client_id
-      client_secret = var.azure_client_secret
+      client_id = "" #var.azure_client_id
+      client_secret = "" #var.azure_client_secret
   }
 }
 
