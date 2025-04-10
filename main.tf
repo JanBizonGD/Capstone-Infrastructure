@@ -40,11 +40,24 @@ data "azurerm_virtual_network" "existing_vnet" {
 }
 
 # Create a subnet in the existing VNet
-resource "azurerm_subnet" "new_subnet" {
+resource "azurerm_subnet" "deploy_subnet" {
   name                 = "Deployment-subnet"
   resource_group_name  = data.azurerm_virtual_network.existing_vnet.resource_group_name
   virtual_network_name = data.azurerm_virtual_network.existing_vnet.name
   address_prefixes     = ["192.168.1.0/24"] 
+}
+
+# Network interface
+resource "azurerm_network_interface" "temp_nic" {
+  name                = "temp-nic"
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
+
+  ip_configuration {
+    name                          = "vm_network_config"
+    subnet_id                     = azurerm_subnet.deploy_subnet.id
+    private_ip_address_allocation = "Static"
+  }
 }
 
 
@@ -118,7 +131,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
     ip_configuration {
       name      = "internal"
       primary   = true
-      subnet_id = azurerm_subnet.subnet.id
+      subnet_id = azurerm_subnet.deploy_subnet.id
     }
   }
 
@@ -128,8 +141,8 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
 # Step 6: Create an external load balancer
 resource "azurerm_lb" "example_lb" {
   name                = "example-lb"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
   frontend_ip_configuration {
     name                                 = "loadbalancer-ip"
     public_ip_address_id                = azurerm_public_ip.lb_public_ip.id
@@ -142,13 +155,14 @@ resource "azurerm_lb_backend_address_pool" "lb_address_pool" {
   name = "lb_address_pool"
 }
 
-resource "azurerm_lb_probes" "lb_probe" {
+resource "azurerm_lb_probe" "lb_probe" {
+  loadbalancer_id = azurerm_lb.example_lb.id
   name                = "example-probe"
   protocol            = "Http"
   port                = 80
   request_path        = "/"
-  interval            = "30"
-  unhealthy_threshold = 2
+  interval_in_seconds = "30"
+  probe_threshold = 2
 }
 
 resource "azurerm_lb_rule" "lb_rule" {
