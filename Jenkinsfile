@@ -12,7 +12,7 @@ pipeline {
             steps {
                 sh 'echo INIT'
 
-                sh 'az login -service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID'
+                sh 'az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID'
                 sh 'az account set --subscription $AZURE_SUBSCRIPTION_ID'
                 sh 'terraform init -backend-config="storage_account_name=jenkinsmaster1101"'
             }
