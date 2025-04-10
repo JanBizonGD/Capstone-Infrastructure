@@ -15,7 +15,7 @@ pipeline {
 
                 sh 'az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID'
                 sh 'az account set --subscription $AZURE_SUBSCRIPTION_ID'
-                sh 'terraform init -upgrade -backend-config="storage_account_name=$AZURE_STORAGE_ACCOUNT"'
+                sh 'terraform init -input=false -backend-config="storage_account_name=$AZURE_STORAGE_ACCOUNT"'
             }
         }
         stage('Formatting'){
@@ -40,7 +40,7 @@ pipeline {
             }
             steps {
                 sh 'echo PLAN'
-                sh 'terraform plan'
+                sh 'terraform plan -input=false -out=tfplan'
             }
         }
         // stage('Push and Apply'){
