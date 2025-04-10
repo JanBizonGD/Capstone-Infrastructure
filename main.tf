@@ -1,26 +1,22 @@
 terraform {
   required_providers {
     azurerm = {
-      source = "hashicopr/azurerm"
+      source = "hashicorp/azurerm"
       version = "~> 3.40.0"
     }
   }
   backend "azurerm" {
       use_cli = true
       use_azuread_auth = true
-      # tenant_id = "84f1e4ea-8554-43e1-8709-f0b8589ea118"
       storage_account_name = "" #var.azure_storage_account
       container_name = "petclinicimage"
       key   = "prod.terraform.tfstate"
-      # client_id = "" #var.azure_client_id
-      # client_secret = "" #var.azure_client_secret
+      # tenant_id = ""
+      # client_id = ""
+      # client_secret = ""
       # subscription_id=""
   }
 }
-
-# TODO: Configure
-# TODO: Add backend
-# TODO: Add credentials
 
 # Step 1: Provider configuration
 provider "azurerm" {
