@@ -11,9 +11,9 @@ terraform {
       storage_account_name = "" #var.azure_storage_account
       container_name = "petclinicimage"
       key   = "prod.terraform.tfstate"
-      client_id = "" #var.azure_client_id
-      client_secret = "" #var.azure_client_secret
-      subscription_id=""
+      #client_id = "" #var.azure_client_id
+      #client_secret = "" #var.azure_client_secret
+      #subscription_id=""
   }
 }
 
@@ -24,7 +24,7 @@ terraform {
 # Step 1: Provider configuration
 provider "azurerm" {
   features {}
-  subscription_id = ""
+  #subscription_id = ""
 }
 
 # Step 2: Define resource group
