@@ -2,10 +2,10 @@ pipeline {
     agent any
     environment {
         AZURE_CRED = credentials('azure-cred')
-        ARM_CLIENT_ID=$AZURE_CRED_USR
-        ARM_CLIENT_SECRET=$AZURE_CRED_PSW
-        ARM_TENANT_ID=84f1e4ea-8554-43e1-8709-f0b8589ea118
-        ARM_SUBSCRIPTION_ID=28e1e42a-4438-4c30-9a5f-7d7b488fd883
+        ARM_CLIENT_ID="$AZURE_CRED_USR"
+        ARM_CLIENT_SECRET="$AZURE_CRED_PSW"
+        ARM_TENANT_ID="84f1e4ea-8554-43e1-8709-f0b8589ea118"
+        ARM_SUBSCRIPTION_ID="28e1e42a-4438-4c30-9a5f-7d7b488fd883"
     }
     stages {
         stage('Loggin'){
