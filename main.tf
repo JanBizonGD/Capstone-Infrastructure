@@ -113,8 +113,8 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
   location            = data.azurerm_resource_group.rg.location
 
   os_disk {
-    caching = ReadWrite
-    storage_account_type = Standard_LRS
+    caching = "ReadWrite"
+    storage_account_type = "Standard_LRS"
   }
 
   sku = "Standard_B1ms"
