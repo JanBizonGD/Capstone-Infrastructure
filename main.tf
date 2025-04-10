@@ -21,7 +21,8 @@ terraform {
 # Step 1: Provider configuration
 provider "azurerm" {
   features {}
-
+  resource_provider_registrations = "none" 
+  
   # subscription_id = ""
   # client_id = ""
   # client_secret = ""
