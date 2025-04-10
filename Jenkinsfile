@@ -6,6 +6,7 @@ pipeline {
         AZURE_CLIENT_SECRET="$AZURE_CRED_PSW"
         AZURE_TENANT_ID="84f1e4ea-8554-43e1-8709-f0b8589ea118"
         AZURE_SUBSCRIPTION_ID="28e1e42a-4438-4c30-9a5f-7d7b488fd883"
+        AZURE_STORAGE_ACCOUNT="jenkinsmaster1101"
     }
     stages {
         stage('Loggin'){
@@ -14,7 +15,7 @@ pipeline {
 
                 sh 'az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID'
                 sh 'az account set --subscription $AZURE_SUBSCRIPTION_ID'
-                sh 'terraform init -backend-config="storage_account_name=jenkinsmaster1101"'
+                sh 'terraform init -backend-config="storage_account_name=$AZURE_STORAGE_ACCOUNT"'
             }
         }
         stage('Formatting'){
@@ -30,6 +31,12 @@ pipeline {
             }
         }
         stage('Plan'){
+            environment {
+                ARM_CLIENT_ID="$AZURE_CLIENT_ID"
+                ARM_CLIENT_SECRET="$AZURE_CLIENT_ID"
+                ARM_TENANT_ID="$AZURE_TENANT_ID"
+                ARM_SUBSCRIPTION_ID="$AZURE_SUBSCRIPTION_ID"
+            }
             steps {
                 sh 'echo PLAN'
                 sh 'terraform plan'
