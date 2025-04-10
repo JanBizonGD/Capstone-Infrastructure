@@ -8,13 +8,13 @@ terraform {
   backend "azurerm" {
       use_cli = true
       use_azuread_auth = true
-      tenant_id = "84f1e4ea-8554-43e1-8709-f0b8589ea118"
+      # tenant_id = "84f1e4ea-8554-43e1-8709-f0b8589ea118"
       storage_account_name = "" #var.azure_storage_account
       container_name = "petclinicimage"
       key   = "prod.terraform.tfstate"
-      client_id = "" #var.azure_client_id
-      client_secret = "" #var.azure_client_secret
-      subscription_id=""
+      # client_id = "" #var.azure_client_id
+      # client_secret = "" #var.azure_client_secret
+      # subscription_id=""
   }
 }
 
@@ -26,10 +26,10 @@ terraform {
 provider "azurerm" {
   features {}
 
-  subscription_id = ""
-  client_id = ""
-  client_secret = ""
-  tenant_id = ""
+  # subscription_id = ""
+  # client_id = ""
+  # client_secret = ""
+  # tenant_id = ""
 }
 
 # Step 2: Define resource group
