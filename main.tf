@@ -29,13 +29,27 @@ provider "azurerm" {
 }
 
 # Step 2: Define resource group
-resource "azurerm_resource_group" "rg" {
-  name     = "rg-example"
-  location = "East US"
+data "azurerm_resource_group" "rg" {
+  name     = "1-18f4829b-playground-sandbox" # To modify
 }
 
+# Create subnet 
+data "azurerm_virtual_network" "existing_vnet" {
+  name                = "jenkinsNetwork"
+  resource_group_name = data.azurerm
+}
+
+# Create a subnet in the existing VNet
+resource "azurerm_subnet" "new_subnet" {
+  name                 = "Deployment-subnet"
+  resource_group_name  = data.azurerm_virtual_network.existing_vnet.resource_group_name
+  virtual_network_name = data.azurerm_virtual_network.existing_vnet.name
+  address_prefixes     = ["192.168.1.0/24"] 
+}
+
+
 # Step 3: Create temporary VM with metadata script for installing Apache
-resource "azurerm_virtual_machine" "temp_vm" {
+resource "azurerm_linux_virtual_machine" "temp_vm" {
   name                  = "temp-vm"
   location             = azurerm_resource_group.rg.location
   resource_group_name  = azurerm_resource_group.rg.name
@@ -46,14 +60,6 @@ resource "azurerm_virtual_machine" "temp_vm" {
   os_disk {
     caching    = "ReadWrite"
     storage_account_type = "Standard_LRS"
-  }
-  os_profile {
-    computer_name  = "temp-vm"
-    admin_username = "adminuser"
-    admin_password = "Password123!"
-  }
-  os_profile_linux_config {
-    disable_password_authentication = false
   }
 
   tags = {
@@ -84,20 +90,23 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
   name                = "vmss-example"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
-  sku {
-    name     = "Standard_B1ms"
-    capacity = 3
+
+  os_disk {
+    caching = ReadWrite
+    storage_account_type = Standard_LRS
   }
+
+  sku = "Standard_B1ms"
   source_image_id = azurerm_image.vm_image.id
   admin_username  = "adminuser"
   admin_password  = "Password123!"
   overprovision   = true
 
-  health_probe {
-    protocol = "Http"
-    port     = 80
-    request_path = "/"
-  }
+  # health_probe {
+  #   protocol = "Http"
+  #   port     = 80
+  #   request_path = "/"
+  # }
 
   tags = {
     environment = "production"
@@ -113,15 +122,11 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
     }
   }
 
-  upgrade_policy {
-    mode = "Manual"
-  }
-
   depends_on = [azurerm_image.vm_image]
 }
 
 # Step 6: Create an external load balancer
-resource "azurerm_lb" "example_lb" {
+resource "azurerm_loadbalancer" "example_lb" {
   name                = "example-lb"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
