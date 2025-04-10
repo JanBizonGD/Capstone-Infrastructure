@@ -6,7 +6,7 @@ terraform {
     }
   }
   backend "azurerm" {
-      use_cli = false
+      use_cli = true
       use_azuread_auth = true
       tenant_id = "84f1e4ea-8554-43e1-8709-f0b8589ea118"
       storage_account_name = "" #var.azure_storage_account
@@ -25,7 +25,7 @@ terraform {
 # Step 1: Provider configuration
 provider "azurerm" {
   features {}
-  
+
   subscription_id = ""
   client_id = ""
   client_secret = ""
