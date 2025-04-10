@@ -36,7 +36,7 @@ data "azurerm_resource_group" "rg" {
 # Create subnet 
 data "azurerm_virtual_network" "existing_vnet" {
   name                = "jenkinsNetwork"
-  resource_group_name = data.azurerm
+  resource_group_name = data.azurerm_resource_group.rg.name
 }
 
 # Create a subnet in the existing VNet
@@ -51,8 +51,8 @@ resource "azurerm_subnet" "new_subnet" {
 # Step 3: Create temporary VM with metadata script for installing Apache
 resource "azurerm_linux_virtual_machine" "temp_vm" {
   name                  = "temp-vm"
-  location             = azurerm_resource_group.rg.location
-  resource_group_name  = azurerm_resource_group.rg.name
+  location             = data.azurerm_resource_group.rg.location
+  resource_group_name  = data.azurerm_resource_group.rg.name
   size                  = "Standard_B1ms"
   network_interface_ids = [azurerm_network_interface.temp_nic.id]
   admin_username       = "adminuser"
@@ -80,16 +80,16 @@ resource "azurerm_linux_virtual_machine" "temp_vm" {
 # Step 4: Create an image from the temporary VM
 resource "azurerm_image" "vm_image" {
   name                = "vm-image"
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
-  source_virtual_machine_id = azurerm_virtual_machine.temp_vm.id
+  resource_group_name = data.azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+  source_virtual_machine_id = azurerm_linux_virtual_machine.temp_vm.id
 }
 
 # Step 5: Create scale set with 3 instances using the custom image and load balancer
 resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
   name                = "vmss-example"
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
 
   os_disk {
     caching = ReadWrite
@@ -126,44 +126,49 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
 }
 
 # Step 6: Create an external load balancer
-resource "azurerm_loadbalancer" "example_lb" {
+resource "azurerm_lb" "example_lb" {
   name                = "example-lb"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  front_end_ip_configuration {
+  frontend_ip_configuration {
     name                                 = "loadbalancer-ip"
     public_ip_address_id                = azurerm_public_ip.lb_public_ip.id
   }
-
-  backend_address_pool {
-    name = "example-backend-pool"
-  }
-
-  probes {
-    name                = "example-probe"
-    protocol            = "Http"
-    port                = 80
-    request_path        = "/"
-    interval            = "30"
-    unhealthy_threshold = 2
-  }
-
-  load_balancing_rule {
-    name                           = "example-lb-rule"
-    protocol                       = "Tcp"
-    frontend_port                  = 80
-    backend_port                   = 80
-    frontend_ip_configuration_name = "loadbalancer-ip"
-    backend_address_pool_id       = azurerm_lb_backend_address_pool.example_lb_backend_pool.id
-    probe_id                       = azurerm_lb_probe.example_lb_probe.id
-  }
 }
+
+# Other lb resources
+resource "azurerm_lb_backend_address_pool" "lb_address_pool" {
+  loadbalancer_id = azurerm_lb.example_lb.id
+  name = "lb_address_pool"
+}
+
+resource "azurerm_lb_probes" "lb_probe" {
+  name                = "example-probe"
+  protocol            = "Http"
+  port                = 80
+  request_path        = "/"
+  interval            = "30"
+  unhealthy_threshold = 2
+}
+
+resource "azurerm_lb_rule" "lb_rule" {
+  loadbalancer_id = azurerm_lb.example_lb.id
+  name                           = "example-lb-rule"
+  protocol                       = "Tcp"
+  frontend_port                  = 80
+  backend_port                   = 80
+  frontend_ip_configuration_name = "loadbalancer-ip"
+  backend_address_pool_ids       = [ azurerm_lb_backend_address_pool.example_lb_backend_pool.id ]
+  probe_id                       = azurerm_lb_probe.example_lb_probe.id
+}
+
+
 
 # Step 7: Create public IP for the load balancer
 resource "azurerm_public_ip" "lb_public_ip" {
   name                = "example-lb-ip"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
   allocation_method   = "Static"
   sku                  = "Basic"
 }
@@ -171,8 +176,8 @@ resource "azurerm_public_ip" "lb_public_ip" {
 # Step 8: Define firewall rules for accessing load balancer from limited IP addresses
 resource "azurerm_network_security_group" "nsg" {
   name                = "example-nsg"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
 
   security_rule {
     name                       = "Allow-SSH"
