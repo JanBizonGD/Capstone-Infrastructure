@@ -79,7 +79,7 @@ resource "azurerm_linux_virtual_machine" "temp_vm" {
     environment = "testing"
   }
 
-  custom_data = <<-EOT
+  custom_data = base64encode(<<-EOT
                 #cloud-config
                 runcmd:
                   - apt-get update
@@ -88,6 +88,7 @@ resource "azurerm_linux_virtual_machine" "temp_vm" {
                   - systemctl start apache2
                   - systemctl enable apache2
                 EOT
+  )
 }
 
 # Step 4: Create an image from the temporary VM
@@ -172,8 +173,8 @@ resource "azurerm_lb_rule" "lb_rule" {
   frontend_port                  = 80
   backend_port                   = 80
   frontend_ip_configuration_name = "loadbalancer-ip"
-  backend_address_pool_ids       = [ azurerm_lb_backend_address_pool.example_lb_backend_pool.id ]
-  probe_id                       = azurerm_lb_probe.example_lb_probe.id
+  backend_address_pool_ids       = [ azurerm_lb_backend_address_pool.lb_address_pool.id ]
+  probe_id                       = azurerm_lb_probe.lb_probe.id
 }
 
 
