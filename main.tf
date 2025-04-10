@@ -1,6 +1,8 @@
 terraform {
   required_providers {
-    azure = {
+    azurerm = {
+      source = "hashicopr/azurerm"
+      version = "~> 3.40.0"
     }
   }
   backend "azurerm" {
@@ -11,6 +13,7 @@ terraform {
       key   = "prod.terraform.tfstate"
       client_id = "" #var.azure_client_id
       client_secret = "" #var.azure_client_secret
+      subscription_id=""
   }
 }
 
@@ -21,6 +24,7 @@ terraform {
 # Step 1: Provider configuration
 provider "azurerm" {
   features {}
+  subscription_id = ""
 }
 
 # Step 2: Define resource group
