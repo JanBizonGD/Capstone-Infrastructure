@@ -11,7 +11,7 @@ pipeline {
                 sh 'export ARM_CLIENT_SECRET=$AZURE_CRED_PSW'
                 sh 'export ARM_TENANT_ID=84f1e4ea-8554-43e1-8709-f0b8589ea118'
                 sh 'export ARM_SUBSCRIPTION_ID=28e1e42a-4438-4c30-9a5f-7d7b488fd883'
-                sh 'terraform init -backend-config="storage_account_name=jenkinsmaster5681"'
+                sh 'terraform init -backend-config="storage_account_name=jenkinsmaster1101"'
             }
         }
         stage('Formatting'){
