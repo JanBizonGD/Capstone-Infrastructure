@@ -32,24 +32,24 @@ pipeline {
         stage('Plan'){
             steps {
                 sh 'echo PLAN'
-                sh 'terraform plan --auto-approve'
+                sh 'terraform plan'
             }
         }
-        stage('Push and Apply'){
-            steps {
-                sh 'echo PUSH'
-                sh 'terraform push'
-                sh 'echo APPLY'
-                sh 'echo (provisioning resource - manual job)'
-                sh 'terraform apply --auto-approve'
-            }
-        }
-        stage('Destroy and Push'){
-            steps {
-                sh 'echo DESTROY'
-                sh 'echo (manual job)'
-                sh 'terraform destroy'
-            }
-        }
+        // stage('Push and Apply'){
+        //     steps {
+        //         sh 'echo PUSH'
+        //         sh 'terraform push'
+        //         sh 'echo APPLY'
+        //         sh 'echo (provisioning resource - manual job)'
+        //         sh 'terraform apply -auto-approve'
+        //     }
+        // }
+        // stage('Destroy and Push'){
+        //     steps {
+        //         sh 'echo DESTROY'
+        //         sh 'echo (manual job)'
+        //         sh 'terraform destroy'
+        //     }
+        // }
     }
 }
