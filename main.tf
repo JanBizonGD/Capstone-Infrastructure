@@ -57,58 +57,58 @@ resource "azurerm_network_interface" "temp_nic" {
 }
 
 
-# Step 3: Create temporary VM with metadata script for installing Apache
-resource "azurerm_linux_virtual_machine" "temp_vm" {
-  name                  = "temp-vm"
-  location             = data.azurerm_resource_group.rg.location
-  resource_group_name  = data.azurerm_resource_group.rg.name
-  size                  = "Standard_B1ms"
-  network_interface_ids = [azurerm_network_interface.temp_nic.id]
-  admin_username       = "adminuser"
-  admin_password       = "Password123!"
-  disable_password_authentication = false
-  os_disk {
-    caching    = "ReadWrite"
-    storage_account_type = "Standard_LRS"
-  }
+# # Step 3: Create temporary VM with metadata script for installing Apache
+# resource "azurerm_linux_virtual_machine" "temp_vm" {
+#   name                  = "temp-vm"
+#   location             = data.azurerm_resource_group.rg.location
+#   resource_group_name  = data.azurerm_resource_group.rg.name
+#   size                  = "Standard_B1ms"
+#   network_interface_ids = [azurerm_network_interface.temp_nic.id]
+#   admin_username       = "adminuser"
+#   admin_password       = "Password123!"
+#   disable_password_authentication = false
+#   os_disk {
+#     caching    = "ReadWrite"
+#     storage_account_type = "Standard_LRS"
+#   }
 
-  source_image_reference {
-    publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-focal"
-    sku       = "20_04-lts"
-    version   = "latest"
-  }
+#   source_image_reference {
+#     publisher = "Canonical"
+#     offer     = "0001-com-ubuntu-server-focal"
+#     sku       = "20_04-lts"
+#     version   = "latest"
+#   }
 
-  tags = {
-    environment = "testing"
-  }
+#   tags = {
+#     environment = "testing"
+#   }
 
-  custom_data = base64encode(<<-EOT
-                #cloud-config
-                runcmd:
-                  - apt-get update
-                  - apt-get install -y apache2
-                  - echo "<html><body><h1>Server: $(hostname)</h1></body></html>" > /var/www/html/index.html
-                  - systemctl start apache2
-                  - systemctl enable apache2
-                EOT
-  )
-}
+#   custom_data = base64encode(<<-EOT
+#                 #cloud-config
+#                 runcmd:
+#                   - apt-get update
+#                   - apt-get install -y apache2
+#                   - echo "<html><body><h1>Server: $(hostname)</h1></body></html>" > /var/www/html/index.html
+#                   - systemctl start apache2
+#                   - systemctl enable apache2
+#                 EOT
+#   )
+# }
 
-# Step 4: Create an image from the temporary VM
-resource "azurerm_image" "vm_image" {
-  name                = "vm-image"
-  resource_group_name = data.azurerm_resource_group.rg.name
-  location            = data.azurerm_resource_group.rg.location
-  source_virtual_machine_id = azurerm_linux_virtual_machine.temp_vm.id
+# # Step 4: Create an image from the temporary VM
+# resource "azurerm_image" "vm_image" {
+#   name                = "vm-image"
+#   resource_group_name = data.azurerm_resource_group.rg.name
+#   location            = data.azurerm_resource_group.rg.location
+#   source_virtual_machine_id = azurerm_linux_virtual_machine.temp_vm.id
 
-  os_disk {
-    storage_type = "Standard_LRS"
-    os_type = "Linux"
-    os_state = "Generalized"
-    managed_disk_id = azurerm_linux_virtual_machine.temp_vm.os_disk[0].id
-  }
-}
+#   os_disk {
+#     storage_type = "Standard_LRS"
+#     os_type = "Linux"
+#     os_state = "Generalized"
+#     managed_disk_id = azurerm_linux_virtual_machine.temp_vm.os_disk[0].id
+#   }
+# }
 
 # Step 5: Create scale set with 3 instances using the custom image and load balancer
 resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
@@ -122,9 +122,16 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
   }
 
   sku = "Standard_B1ms"
-  source_image_id = azurerm_image.vm_image.id
+  #source_image_id = azurerm_image.vm_image.id
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-focal"
+    sku       = "20_04-lts"
+    version   = "latest"
+  }
   admin_username  = "adminuser"
   admin_password  = "Password123!"
+  disable_password_authentication = false
   overprovision   = true
 
   # health_probe {
@@ -147,7 +154,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
     }
   }
 
-  depends_on = [azurerm_image.vm_image]
+  #depends_on = [azurerm_image.vm_image]
 }
 
 # Step 6: Create an external load balancer
