@@ -101,6 +101,13 @@ resource "azurerm_image" "vm_image" {
   resource_group_name = data.azurerm_resource_group.rg.name
   location            = data.azurerm_resource_group.rg.location
   source_virtual_machine_id = azurerm_linux_virtual_machine.temp_vm.id
+
+  os_disk {
+    storage_type = "Standard_LRS"
+    os_type = Linux
+    os_state = "Generalized"
+    managed_disk_id = azurerm_linux_virtual_machine.temp_vm.os_disk.id
+  }
 }
 
 # Step 5: Create scale set with 3 instances using the custom image and load balancer
