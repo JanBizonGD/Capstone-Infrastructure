@@ -11,6 +11,9 @@ pipeline {
     }
     stages {
         stage('Loggin'){
+            when {
+                expression { params.action != 'destory' }
+            }
             steps {
                 sh 'echo INIT'
 
@@ -20,18 +23,27 @@ pipeline {
             }
         }
         stage('Formatting'){
+            when {
+                expression { params.action != 'destory' }
+            }
             steps {
                 sh 'echo FORMATTING'
                 sh 'terraform fmt -diff'
             }
         }
         stage('Validation and Scanning'){
+            when {
+                expression { params.action != 'destory' }
+            }
             steps {
                 sh 'echo VALIDATION AND SCANNING'
                 sh 'terraform validate'
             }
         }
         stage('Plan'){
+            when {
+                expression { params.action != 'destory' }
+            }
             environment {
                 ARM_CLIENT_ID="$AZURE_CLIENT_ID"
                 ARM_CLIENT_SECRET="$AZURE_CLIENT_SECRET"
@@ -44,21 +56,25 @@ pipeline {
                 sh 'terraform plan -input=false -out=tfplan -var="resource_group_name=$AZURE_RESOURCE_GROUP"'
             }
         }
-        // stage('Push and Apply'){
-        //     steps {
-        //         sh 'echo PUSH'
-        //         sh 'terraform push'
-        //         sh 'echo APPLY'
-        //         sh 'echo (provisioning resource - manual job)'
-        //         sh 'terraform apply -auto-approve'
-        //     }
-        // }
-        // stage('Destroy and Push'){
-        //     steps {
-        //         sh 'echo DESTROY'
-        //         sh 'echo (manual job)'
-        //         sh 'terraform destroy'
-        //     }
-        // }
+        stage('Apply'){
+            when {
+                expression { params.action == 'apply' }
+            }
+            steps {
+                // sh 'echo PUSH'
+                // sh 'terraform push'
+                sh 'echo APPLY'
+                sh 'terraform apply tfplan'
+            }
+        }
+        stage('Destroy'){
+            when {
+                expression { params.action == 'destory' }
+            }
+            steps {
+                sh 'echo DESTROY'
+                sh 'terraform destroy'
+            }
+        }
     }
 }
