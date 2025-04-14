@@ -202,8 +202,8 @@ resource "azurerm_public_ip" "lb_public_ip" {
   name                = "example-lb-ip"
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
-  allocation_method   = "Static"
-  sku                  = "Basic"
+  allocation_method   = "Dynamic"
+  #sku                  = "Basic"
 }
 
 # Step 8: Define firewall rules for accessing load balancer from limited IP addresses
