@@ -12,10 +12,10 @@ pipeline {
     stages {
         stage('Loggin'){
             when {
-                expression { params.action != 'destory' }
+                expression { params.Action != 'destory' }
             }
             steps {
-                sh '${params.action}'
+                sh '${params.Action}'
                 sh 'echo INIT'
 
                 sh 'az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID'
