@@ -4,9 +4,10 @@ pipeline {
         AZURE_CRED = credentials('azure-cred')
         AZURE_CLIENT_ID="$AZURE_CRED_USR"
         AZURE_CLIENT_SECRET="$AZURE_CRED_PSW"
-        AZURE_TENANT_ID="84f1e4ea-8554-43e1-8709-f0b8589ea118"
-        AZURE_SUBSCRIPTION_ID="9734ed68-621d-47ed-babd-269110dbacb1"
-        AZURE_STORAGE_ACCOUNT="jenkinsmaster7989"
+        // AZURE_TENANT_ID="84f1e4ea-8554-43e1-8709-f0b8589ea118"
+        // AZURE_SUBSCRIPTION_ID="9734ed68-621d-47ed-babd-269110dbacb1"
+        // AZURE_STORAGE_ACCOUNT="jenkinsmaster7989"
+        // AZURE_RESOURCE_GROUP="1-c27c81ae-playground-sandbox"
     }
     stages {
         stage('Loggin'){
@@ -40,7 +41,7 @@ pipeline {
             }
             steps {
                 sh 'echo PLAN'
-                sh 'terraform plan -input=false -out=tfplan'
+                sh 'terraform plan -input=false -out=tfplan -var="resource_group_name=$AZURE_RESOURCE_GROUP"'
             }
         }
         // stage('Push and Apply'){

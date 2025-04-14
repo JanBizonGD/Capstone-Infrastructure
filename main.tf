@@ -8,30 +8,25 @@ terraform {
   backend "azurerm" {
       use_cli = true
       use_azuread_auth = true
-      storage_account_name = "" #var.azure_storage_account
+      storage_account_name = ""
       container_name = "petclinicimage"
       key   = "prod.terraform.tfstate"
-      # tenant_id = ""
-      # client_id = ""
-      # client_secret = ""
-      # subscription_id=""
   }
+}
+variable "resource_group_name" {
+  type = string
+  nullable = false
 }
 
 # Step 1: Provider configuration
 provider "azurerm" {
   features {}
   resource_provider_registrations = "none" 
-  
-  # subscription_id = ""
-  # client_id = ""
-  # client_secret = ""
-  # tenant_id = ""
 }
 
 # Step 2: Define resource group
 data "azurerm_resource_group" "rg" {
-  name     = "1-c27c81ae-playground-sandbox" # To modify
+  name     = var.resource_group_name
 }
 
 # Create subnet 
