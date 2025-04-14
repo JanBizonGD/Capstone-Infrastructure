@@ -5,8 +5,8 @@ pipeline {
         AZURE_CLIENT_ID="$AZURE_CRED_USR"
         AZURE_CLIENT_SECRET="$AZURE_CRED_PSW"
         AZURE_TENANT_ID="84f1e4ea-8554-43e1-8709-f0b8589ea118"
-        AZURE_SUBSCRIPTION_ID="28e1e42a-4438-4c30-9a5f-7d7b488fd883"
-        AZURE_STORAGE_ACCOUNT="jenkinsmaster1101"
+        AZURE_SUBSCRIPTION_ID="9734ed68-621d-47ed-babd-269110dbacb1"
+        AZURE_STORAGE_ACCOUNT="jenkinsmaster7989"
     }
     stages {
         stage('Loggin'){
