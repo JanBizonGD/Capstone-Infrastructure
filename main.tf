@@ -40,7 +40,7 @@ resource "azurerm_subnet" "deploy_subnet" {
   name                 = "Deployment-subnet"
   resource_group_name  = data.azurerm_virtual_network.existing_vnet.resource_group_name
   virtual_network_name = data.azurerm_virtual_network.existing_vnet.name
-  address_prefixes     = ["10.0.2.0/24"] 
+  address_prefixes     = ["10.1.2.0/24"] 
 }
 
 # Network interface
@@ -205,7 +205,7 @@ resource "azurerm_network_security_group" "nsg" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "22"
-    source_address_prefix      = "10.0.2.0/24"
+    source_address_prefix      = "10.1.2.0/24"
     destination_address_prefix = "*"
   }
 
@@ -217,7 +217,7 @@ resource "azurerm_network_security_group" "nsg" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "80"
-    source_address_prefix      = "10.0.2.0/24"
+    source_address_prefix      = "10.1.2.0/24"
     destination_address_prefix = "*"
   }
 }
