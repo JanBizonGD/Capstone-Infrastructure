@@ -87,7 +87,7 @@ pipeline {
             }
             steps {
                 sh 'echo DESTROY'
-                sh 'terraform destroy'
+                sh 'terraform destroy -var="resource_group_name=$AZURE_RESOURCE_GROUP"'
             }
         }
     }
