@@ -60,6 +60,13 @@ pipeline {
             when {
                 expression { params.Action == 'apply' }
             }
+            environment {
+                ARM_CLIENT_ID="$AZURE_CLIENT_ID"
+                ARM_CLIENT_SECRET="$AZURE_CLIENT_SECRET"
+                ARM_TENANT_ID="$AZURE_TENANT_ID"
+                ARM_SUBSCRIPTION_ID="$AZURE_SUBSCRIPTION_ID"
+                ARM_RESOURCE_PROVIDER_REGISTRATIONS="none"
+            }
             steps {
                 // sh 'echo PUSH'
                 // sh 'terraform push'
@@ -70,6 +77,13 @@ pipeline {
         stage('Destroy'){
             when {
                 expression { params.Action == 'destory' }
+            }
+            environment {
+                ARM_CLIENT_ID="$AZURE_CLIENT_ID"
+                ARM_CLIENT_SECRET="$AZURE_CLIENT_SECRET"
+                ARM_TENANT_ID="$AZURE_TENANT_ID"
+                ARM_SUBSCRIPTION_ID="$AZURE_SUBSCRIPTION_ID"
+                ARM_RESOURCE_PROVIDER_REGISTRATIONS="none"
             }
             steps {
                 sh 'echo DESTROY'
