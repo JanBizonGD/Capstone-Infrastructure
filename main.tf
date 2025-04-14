@@ -66,6 +66,7 @@ resource "azurerm_linux_virtual_machine" "temp_vm" {
   network_interface_ids = [azurerm_network_interface.temp_nic.id]
   admin_username       = "adminuser"
   admin_password       = "Password123!"
+  disable_password_authentication = false
   os_disk {
     caching    = "ReadWrite"
     storage_account_type = "Standard_LRS"
