@@ -31,7 +31,7 @@ provider "azurerm" {
 
 # Step 2: Define resource group
 data "azurerm_resource_group" "rg" {
-  name     = "1-18f4829b-playground-sandbox" # To modify
+  name     = "1-c27c81ae-playground-sandbox" # To modify
 }
 
 # Create subnet 
