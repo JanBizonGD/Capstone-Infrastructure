@@ -104,7 +104,7 @@ resource "azurerm_image" "vm_image" {
 
   os_disk {
     storage_type = "Standard_LRS"
-    os_type = Linux
+    os_type = "Linux"
     os_state = "Generalized"
     managed_disk_id = azurerm_linux_virtual_machine.temp_vm.os_disk.id
   }
