@@ -29,10 +29,11 @@ data "azurerm_resource_group" "rg" {
   name     = var.resource_group_name
 }
 
-# Create subnet 
+# Create network 
 data "azurerm_virtual_network" "existing_vnet" {
   name                = "jenkinsNetwork"
   resource_group_name = data.azurerm_resource_group.rg.name
+  address_space       = ["192.168.0.0/16"]
 }
 
 # Create a subnet in the existing VNet
