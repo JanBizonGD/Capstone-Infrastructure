@@ -121,7 +121,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
     storage_account_type = "Standard_LRS"
   }
 
-  sku = "Standard_B1ms"
+  sku = "Standard_B2ms"
   #source_image_id = azurerm_image.vm_image.id
   source_image_reference {
     publisher = "Canonical"
