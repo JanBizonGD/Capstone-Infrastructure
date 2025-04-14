@@ -15,7 +15,6 @@ pipeline {
                 expression { params.Action != 'destory' }
             }
             steps {
-                sh '${params.Action}'
                 sh 'echo INIT'
 
                 sh 'az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID'
@@ -25,7 +24,7 @@ pipeline {
         }
         stage('Formatting'){
             when {
-                expression { params.action != 'destory' }
+                expression { params.Action != 'destory' }
             }
             steps {
                 sh 'echo FORMATTING'
@@ -34,7 +33,7 @@ pipeline {
         }
         stage('Validation and Scanning'){
             when {
-                expression { params.action != 'destory' }
+                expression { params.Action != 'destory' }
             }
             steps {
                 sh 'echo VALIDATION AND SCANNING'
@@ -43,7 +42,7 @@ pipeline {
         }
         stage('Plan'){
             when {
-                expression { params.action != 'destory' }
+                expression { params.Action != 'destory' }
             }
             environment {
                 ARM_CLIENT_ID="$AZURE_CLIENT_ID"
@@ -59,7 +58,7 @@ pipeline {
         }
         stage('Apply'){
             when {
-                expression { params.action == 'apply' }
+                expression { params.Action == 'apply' }
             }
             steps {
                 // sh 'echo PUSH'
@@ -70,7 +69,7 @@ pipeline {
         }
         stage('Destroy'){
             when {
-                expression { params.action == 'destory' }
+                expression { params.Action == 'destory' }
             }
             steps {
                 sh 'echo DESTROY'
