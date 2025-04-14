@@ -12,7 +12,7 @@ pipeline {
     stages {
         stage('Loggin'){
             when {
-                expression { params.Action != 'destory' }
+                expression { params.Action != 'destroy' }
             }
             steps {
                 sh 'echo INIT'
@@ -24,7 +24,7 @@ pipeline {
         }
         stage('Formatting'){
             when {
-                expression { params.Action != 'destory' }
+                expression { params.Action != 'destroy' }
             }
             steps {
                 sh 'echo FORMATTING'
@@ -33,7 +33,7 @@ pipeline {
         }
         stage('Validation and Scanning'){
             when {
-                expression { params.Action != 'destory' }
+                expression { params.Action != 'destroy' }
             }
             steps {
                 sh 'echo VALIDATION AND SCANNING'
@@ -42,7 +42,7 @@ pipeline {
         }
         stage('Plan'){
             when {
-                expression { params.Action != 'destory' }
+                expression { params.Action != 'destroy' }
             }
             environment {
                 ARM_CLIENT_ID="$AZURE_CLIENT_ID"
@@ -76,7 +76,7 @@ pipeline {
         }
         stage('Destroy'){
             when {
-                expression { params.Action == 'destory' }
+                expression { params.Action == 'destroy' }
             }
             environment {
                 ARM_CLIENT_ID="$AZURE_CLIENT_ID"
