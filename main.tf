@@ -202,7 +202,7 @@ resource "azurerm_public_ip" "lb_public_ip" {
   name                = "example-lb-ip"
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
-  allocation_method   = "Dynamic"
+  allocation_method   = "Static"
   #sku                  = "Basic"
 }
 
