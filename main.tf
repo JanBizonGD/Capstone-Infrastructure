@@ -116,13 +116,14 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
   resource_group_name = data.azurerm_resource_group.rg.name
   location            = data.azurerm_resource_group.rg.location
 
+  instances = 3
+
   os_disk {
     caching = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
 
   sku = "Standard_B2ms"
-  #source_image_id = azurerm_image.vm_image.id
   source_image_reference {
     publisher = "Canonical"
     offer     = "0001-com-ubuntu-server-focal"
@@ -134,12 +135,6 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
   disable_password_authentication = false
   overprovision   = true
 
-  # health_probe {
-  #   protocol = "Http"
-  #   port     = 80
-  #   request_path = "/"
-  # }
-
   tags = {
     environment = "production"
   }
@@ -147,14 +142,25 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
   network_interface {
     name                      = "primary-nic"
     primary                   = true
+    network_security_group_id = azurerm_network_security_group.nsg.id
+
     ip_configuration {
-      name      = "internal"
+      name                          = "vm_network_config"
       primary   = true
-      subnet_id = azurerm_subnet.deploy_subnet.id
+      subnet_id                     = azurerm_subnet.deploy_subnet.id
     }
   }
 
-  #depends_on = [azurerm_image.vm_image]
+  custom_data = base64encode(<<-EOT
+                #cloud-config
+                runcmd:
+                  - apt-get update
+                  - apt-get install -y apache2
+                  - echo "<html><body><h1>Server: $(hostname)</h1></body></html>" > /var/www/html/index.html
+                  - systemctl start apache2
+                  - systemctl enable apache2
+                EOT
+                )
 }
 
 # Step 6: Create an external load balancer
@@ -220,7 +226,7 @@ resource "azurerm_network_security_group" "nsg" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "22"
-    source_address_prefix      = "10.1.2.0/24"
+    # source_address_prefix      = "10.1.2.0/24"
     destination_address_prefix = "*"
   }
 
@@ -232,13 +238,13 @@ resource "azurerm_network_security_group" "nsg" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "80"
-    source_address_prefix      = "10.1.2.0/24"
+    # source_address_prefix      = "10.1.2.0/24"
     destination_address_prefix = "*"
   }
 }
 
-# Step 9: Associate NSG with the load balancer
-resource "azurerm_network_interface_security_group_association" "nic_nsg_association" {
-  network_interface_id      = azurerm_network_interface.temp_nic.id
-  network_security_group_id = azurerm_network_security_group.nsg.id
-}
+# # Step 9: Associate NSG with the load balancer
+# resource "azurerm_network_interface_security_group_association" "nic_nsg_association" {
+#   network_interface_id      = azurerm_network_interface.temp_nic.id
+#   network_security_group_id = azurerm_network_security_group.nsg.id
+# }
