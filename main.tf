@@ -40,72 +40,16 @@ resource "azurerm_subnet" "deploy_subnet" {
   address_prefixes     = ["10.1.2.0/24"] 
 }
 
-# Network interface
-# resource "azurerm_network_interface" "temp_nic" {
-#   name                = "temp-nic"
-#   location            = data.azurerm_resource_group.rg.location
-#   resource_group_name = data.azurerm_resource_group.rg.name
 
-#   ip_configuration {
-#     name                          = "vm_network_config"
-#     subnet_id                     = azurerm_subnet.deploy_subnet.id
-#     private_ip_address_allocation = "Dynamic"
-#   }
-# }
-
-
-# # Step 3: Create temporary VM with metadata script for installing Apache
-# resource "azurerm_linux_virtual_machine" "temp_vm" {
-#   name                  = "temp-vm"
-#   location             = data.azurerm_resource_group.rg.location
-#   resource_group_name  = data.azurerm_resource_group.rg.name
-#   size                  = "Standard_B1ms"
-#   network_interface_ids = [azurerm_network_interface.temp_nic.id]
-#   admin_username       = "adminuser"
-#   admin_password       = "Password123!"
-#   disable_password_authentication = false
-#   os_disk {
-#     caching    = "ReadWrite"
-#     storage_account_type = "Standard_LRS"
-#   }
-
-#   source_image_reference {
-#     publisher = "Canonical"
-#     offer     = "0001-com-ubuntu-server-focal"
-#     sku       = "20_04-lts"
-#     version   = "latest"
-#   }
-
-#   tags = {
-#     environment = "testing"
-#   }
-
-#   custom_data = base64encode(<<-EOT
-#                 #cloud-config
-#                 runcmd:
-#                   - apt-get update
-#                   - apt-get install -y apache2
-#                   - echo "<html><body><h1>Server: $(hostname)</h1></body></html>" > /var/www/html/index.html
-#                   - systemctl start apache2
-#                   - systemctl enable apache2
-#                 EOT
-#   )
-# }
-
-# # Step 4: Create an image from the temporary VM
-# resource "azurerm_image" "vm_image" {
-#   name                = "vm-image"
-#   resource_group_name = data.azurerm_resource_group.rg.name
-#   location            = data.azurerm_resource_group.rg.location
-#   source_virtual_machine_id = azurerm_linux_virtual_machine.temp_vm.id
-
-#   os_disk {
-#     storage_type = "Standard_LRS"
-#     os_type = "Linux"
-#     os_state = "Generalized"
-#     managed_disk_id = azurerm_linux_virtual_machine.temp_vm.os_disk[0].id
-#   }
-# }
+resource "azurerm_container_registry" "acr" {
+  name                = "containerRegistry1"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  sku                 = "Standard"
+  admin_enabled       = true
+  admin_username      = "admin"
+  admin_password      = "Password123!"
+}
 
 # Step 5: Create scale set with 3 instances using the custom image and load balancer
 resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
@@ -154,12 +98,22 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
 sudo apt update && apt install -y apache2
 sudo systemctl start apache2
 sudo systemctl enable apache2
+apt update && apt install -y docker
+apt update && apt install -y docker-buildx
+apt update && apt install -y openjdk-21-jdk
+apt update && apt install -y apt-transport-https ca-certificates curl software-properties-common
+apt update && apt install -y sudo
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository "deb https://download.docker.com/linux/ubuntu focal stable"
+apt update && sudo apt install -y containerd.io
+sudo apt install -y docker-ce
 EOT
 )
-          # base64encode()
+# Tabs may be a problem here
+
 }
 
-# Step 6: Create an external load balancer
+# Create load balancer
 resource "azurerm_lb" "example_lb" {
   name                = "example-lb"
   location            = data.azurerm_resource_group.rg.location
@@ -251,8 +205,3 @@ resource "azurerm_network_security_group" "nsg" {
     }
 }
 
-# # Step 9: Associate NSG with the load balancer
-# resource "azurerm_network_interface_security_group_association" "nic_nsg_association" {
-#   network_interface_id      = azurerm_network_interface.temp_nic.id
-#   network_security_group_id = azurerm_network_security_group.nsg.id
-# }
