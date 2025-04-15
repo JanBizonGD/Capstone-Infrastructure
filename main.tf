@@ -44,17 +44,17 @@ resource "azurerm_subnet" "deploy_subnet" {
 }
 
 # Network interface
-resource "azurerm_network_interface" "temp_nic" {
-  name                = "temp-nic"
-  location            = data.azurerm_resource_group.rg.location
-  resource_group_name = data.azurerm_resource_group.rg.name
+# resource "azurerm_network_interface" "temp_nic" {
+#   name                = "temp-nic"
+#   location            = data.azurerm_resource_group.rg.location
+#   resource_group_name = data.azurerm_resource_group.rg.name
 
-  ip_configuration {
-    name                          = "vm_network_config"
-    subnet_id                     = azurerm_subnet.deploy_subnet.id
-    private_ip_address_allocation = "Dynamic"
-  }
-}
+#   ip_configuration {
+#     name                          = "vm_network_config"
+#     subnet_id                     = azurerm_subnet.deploy_subnet.id
+#     private_ip_address_allocation = "Dynamic"
+#   }
+# }
 
 
 # # Step 3: Create temporary VM with metadata script for installing Apache
@@ -148,17 +148,14 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
       name                          = "internal" # vm_network_config
       primary   = true
       subnet_id                     = azurerm_subnet.deploy_subnet.id
+      load_balancer_backend_address_pool_ids = [ azurerm_lb_backend_address_pool.lb_address_pool.id ]
     }
   }
 
   custom_data = base64encode(<<-EOT
-                #cloud-config
-                runcmd:
-                  - apt-get update
-                  - apt-get install -y apache2
-                  - echo "<html><body><h1>Server: $(hostname)</h1></body></html>" > /var/www/html/index.html
-                  - systemctl start apache2
-                  - systemctl enable apache2
+                sudo apt update && apt install -y apache2
+                sudo systemctl start apache2
+                sudo systemctl enable apache2
                 EOT
                 )
 }
@@ -241,6 +238,18 @@ resource "azurerm_network_security_group" "nsg" {
     source_address_prefix      = "0.0.0.0/0"
     destination_address_prefix = "*"
   }
+
+   security_rule {
+     access                                     = "Allow"
+     destination_address_prefix                 = "*"
+     destination_port_range                     = "80"
+     direction                                  = "Outbound"
+     name                                       = "AllowAnyCustom80Outbound"
+     priority                                   = 210
+     protocol                                   = "*"
+     source_address_prefix                      = "*"
+     source_port_range                          = "*"
+    }
 }
 
 # # Step 9: Associate NSG with the load balancer
