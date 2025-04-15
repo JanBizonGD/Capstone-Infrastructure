@@ -145,7 +145,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
     network_security_group_id = azurerm_network_security_group.nsg.id
 
     ip_configuration {
-      name                          = "vm_network_config"
+      name                          = "internal" # vm_network_config
       primary   = true
       subnet_id                     = azurerm_subnet.deploy_subnet.id
     }
