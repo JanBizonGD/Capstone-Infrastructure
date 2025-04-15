@@ -18,18 +18,15 @@ variable "resource_group_name" {
   nullable = false
 }
 
-# Step 1: Provider configuration
+# Provider configuration
 provider "azurerm" {
   features {}
   resource_provider_registrations = "none" 
 }
 
-# Step 2: Define resource group
 data "azurerm_resource_group" "rg" {
   name     = var.resource_group_name
-}
-
-# Create network 
+} 
 data "azurerm_virtual_network" "existing_vnet" {
   name                = "jenkinsNetwork"
   resource_group_name = data.azurerm_resource_group.rg.name
@@ -152,12 +149,13 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
     }
   }
 
-  custom_data = base64encode(<<-EOT
+  custom_data = <<-EOT
+                #!/bin/bash
                 sudo apt update && apt install -y apache2
                 sudo systemctl start apache2
                 sudo systemctl enable apache2
                 EOT
-                )
+          # base64encode()
 }
 
 # Step 6: Create an external load balancer
