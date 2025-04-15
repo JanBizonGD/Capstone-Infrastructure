@@ -149,12 +149,13 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
     }
   }
 
-  custom_data = <<-EOT
-                #!/bin/bash
-                sudo apt update && apt install -y apache2
-                sudo systemctl start apache2
-                sudo systemctl enable apache2
-                EOT
+  custom_data = base64encode(<<-EOT
+#!/bin/bash
+sudo apt update && apt install -y apache2
+sudo systemctl start apache2
+sudo systemctl enable apache2
+EOT
+)
           # base64encode()
 }
 
