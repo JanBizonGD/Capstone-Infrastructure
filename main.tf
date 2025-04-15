@@ -47,9 +47,14 @@ resource "azurerm_container_registry" "acr" {
   location            = data.azurerm_resource_group.rg.location
   sku                 = "Standard"
   admin_enabled       = true
-  admin_username      = "admin"
-  admin_password      = "Password123!"
 }
+output "acr_username" {
+  value = azurerm_container_registry.acr.admin_username
+}
+output "acr_password" {
+  value = azurerm_container_registry.acr.admin_password
+}
+
 
 # Step 5: Create scale set with 3 instances using the custom image and load balancer
 resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
