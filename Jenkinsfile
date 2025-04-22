@@ -4,10 +4,6 @@ pipeline {
         AZURE_CRED = credentials('azure-cred')
         AZURE_CLIENT_ID="$AZURE_CRED_USR"
         AZURE_CLIENT_SECRET="$AZURE_CRED_PSW"
-        // AZURE_TENANT_ID="84f1e4ea-8554-43e1-8709-f0b8589ea118"
-        // AZURE_SUBSCRIPTION_ID="9734ed68-621d-47ed-babd-269110dbacb1"
-        // AZURE_STORAGE_ACCOUNT="jenkinsmaster7989"
-        // AZURE_RESOURCE_GROUP="1-c27c81ae-playground-sandbox"
     }
     stages {
         stage('Loggin'){
@@ -68,10 +64,90 @@ pipeline {
                 ARM_RESOURCE_PROVIDER_REGISTRATIONS="none"
             }
             steps {
-                // sh 'echo PUSH'
-                // sh 'terraform push'
                 sh 'echo APPLY'
                 sh 'terraform apply tfplan'
+            }
+        }
+        stage('Add ACR Credential') {
+            when {
+                expression { params.Action == 'apply' }
+            }
+            steps {
+                script {
+                    import com.cloudbees.plugins.credentials.*
+                    import com.cloudbees.plugins.credentials.domains.*
+                    import com.cloudbees.plugins.credentials.impl.*
+                    import jenkins.model.*
+
+                    def credentialId = "acr-cred"
+
+                    def existing = com.cloudbees.plugins.credentials.CredentialsProvider.lookupCredentials(
+                        com.cloudbees.plugins.credentials.common.StandardCredentials.class,
+                        Jenkins.instance,
+                        null,
+                        null
+                    ).find { it.id == credential_id }
+
+                    if (!existing) {
+                        username = "$(terraform output -raw acr_username)"
+                        password = "$(terraform output -raw acr_password)"
+                        description = "Service principal credentials for connection to container registry deployed on azure"
+                        credentials = new UsernamePasswordCredentialsImpl(
+                            CredentialsScope.GLOBAL,
+                            credentialId,
+                            description,
+                            username,
+                            password
+                        )
+
+                        SystemCredentialsProvider.getInstance().getStore().addCredentials(Domain.global(), credentials)
+                        SystemCredentialsProvider.getInstance().save()
+                        echo "Credential '${credentialId}' added."
+                    } else {
+                        echo "Credential '${credentialId}' already exists."
+                    }
+                }
+            }
+        }
+        stage('Add Instance Credential') {
+            when {
+                expression { params.Action == 'apply' }
+            }
+            steps {
+                script {
+                    import com.cloudbees.plugins.credentials.*
+                    import com.cloudbees.plugins.credentials.domains.*
+                    import com.cloudbees.plugins.credentials.impl.*
+                    import jenkins.model.*
+
+                    def credentialId = "deploy-group-cred"
+
+                    def existing = com.cloudbees.plugins.credentials.CredentialsProvider.lookupCredentials(
+                        com.cloudbees.plugins.credentials.common.StandardCredentials.class,
+                        Jenkins.instance,
+                        null,
+                        null
+                    ).find { it.id == credential_id }
+
+                    if (!existing) {
+                        username = "$(terraform output -raw instance_username)"
+                        password = "$(terraform output -raw instance_password)"
+                        description = "Service principal credentials for connection to container registry deployed on azure"
+                        credentials = new UsernamePasswordCredentialsImpl(
+                            CredentialsScope.GLOBAL,
+                            credentialId,
+                            description,
+                            username,
+                            password
+                        )
+
+                        SystemCredentialsProvider.getInstance().getStore().addCredentials(Domain.global(), credentials)
+                        SystemCredentialsProvider.getInstance().save()
+                        echo "Credential '${credentialId}' added."
+                    } else {
+                        echo "Credential '${credentialId}' already exists."
+                    }
+                }
             }
         }
         stage('Destroy'){

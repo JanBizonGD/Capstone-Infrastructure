@@ -119,6 +119,15 @@ EOT
 # Tabs may be a problem here
 
 }
+output "instance_username" {
+  value = azurerm_linux_virtual_machine_scale_set.vmss.admin_username
+}
+output "instance_password" {
+  value = azurerm_linux_virtual_machine_scale_set.vmss.admin_password
+  sensitive = true
+}
+
+
 
 # Create load balancer
 resource "azurerm_lb" "example_lb" {
@@ -136,6 +145,16 @@ resource "azurerm_lb_backend_address_pool" "lb_address_pool" {
   loadbalancer_id = azurerm_lb.example_lb.id
   name = "lb_address_pool"
 }
+
+# TODO: is it nessesery - can i use above on?
+data "azurerm_lb_backend_address_pool" "vmss_nics" {
+  name = "lb_address_pool"
+  loadbalancer_id = data.azurerm_lb.example.id
+}
+output "private_ips" {
+  value = data.azurerm_lb_backend_address_pool.vmss_nics.backend_ip_configurations
+}
+
 
 resource "azurerm_lb_probe" "lb_probe" {
   loadbalancer_id = azurerm_lb.example_lb.id
