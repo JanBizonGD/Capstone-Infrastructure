@@ -89,10 +89,16 @@ pipeline {
                     ).find { it.id == credential_id }
 
                     if (!existing) {
-                        username = "$(terraform output -raw acr_username)"
-                        password = "$(terraform output -raw acr_password)"
-                        description = "Service principal credentials for connection to container registry deployed on azure"
-                        credentials = new UsernamePasswordCredentialsImpl(
+                        def username =  sh (
+                            script: 'terraform output -raw acr_username',
+                            returnStdout: true
+                        ).trim()
+                        def password = sh (
+                            script: 'terraform output -raw acr_password',
+                            returnStdout: true
+                        ).trim()
+                        def description = "Service principal credentials for connection to container registry deployed on azure"
+                        def credentials = new UsernamePasswordCredentialsImpl(
                             CredentialsScope.GLOBAL,
                             credentialId,
                             description,
@@ -130,10 +136,16 @@ pipeline {
                     ).find { it.id == credential_id }
 
                     if (!existing) {
-                        username = "$(terraform output -raw instance_username)"
-                        password = "$(terraform output -raw instance_password)"
-                        description = "Service principal credentials for connection to container registry deployed on azure"
-                        credentials = new UsernamePasswordCredentialsImpl(
+                        def username = sh (
+                            script: 'terraform output -raw instance_username',
+                            returnStdout: true
+                        ).trim()
+                        def password = sh (
+                            script: 'terraform output -raw instance_password',
+                            returnStdout: true
+                        ).trim()
+                        def description = "Service principal credentials for connection to container registry deployed on azure"
+                        def credentials = new UsernamePasswordCredentialsImpl(
                             CredentialsScope.GLOBAL,
                             credentialId,
                             description,
