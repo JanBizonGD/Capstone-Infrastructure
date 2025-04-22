@@ -120,11 +120,6 @@ pipeline {
             }
             steps {
                 script {
-                    // import com.cloudbees.plugins.credentials.*
-                    // import com.cloudbees.plugins.credentials.domains.*
-                    // import com.cloudbees.plugins.credentials.impl.*
-                    // import jenkins.model.*
-
                     def credentialId = "deploy-group-cred"
 
                     def existing = com.cloudbees.plugins.credentials.CredentialsProvider.lookupCredentials(
@@ -179,3 +174,5 @@ pipeline {
         }
     }
 }
+
+// TODO: 'terraform output -raw private_ips'
