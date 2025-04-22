@@ -85,7 +85,7 @@ pipeline {
                         Jenkins.instance,
                         null,
                         null
-                    ).find { it.id == credential_id }
+                    ).find { it.id == credentialId }
 
                     if (!existing) {
                         def username =  sh (
@@ -132,7 +132,7 @@ pipeline {
                         Jenkins.instance,
                         null,
                         null
-                    ).find { it.id == credential_id }
+                    ).find { it.id == credentialId }
 
                     if (!existing) {
                         def username = sh (
