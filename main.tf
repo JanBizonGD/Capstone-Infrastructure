@@ -100,11 +100,11 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
     }
   }
 
+# sudo apt update && apt install -y apache2
+# sudo systemctl start apache2
+# sudo systemctl enable apache2
   custom_data = base64encode(<<-EOT
 #!/bin/bash
-sudo apt update && apt install -y apache2
-sudo systemctl start apache2
-sudo systemctl enable apache2
 apt update && apt install -y docker
 apt update && apt install -y docker-buildx
 apt update && apt install -y openjdk-21-jdk
