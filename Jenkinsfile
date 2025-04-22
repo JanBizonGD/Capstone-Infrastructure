@@ -77,44 +77,40 @@ pipeline {
                 expression { params.Action == 'apply' }
             }
             steps {
-                withGroovy{
-                    //script {
+                script {
+                    def credentialId = "acr-cred"
 
+                    def existing = com.cloudbees.plugins.credentials.CredentialsProvider.lookupCredentials(
+                        com.cloudbees.plugins.credentials.common.StandardCredentials.class,
+                        Jenkins.instance,
+                        null,
+                        null
+                    ).find { it.id == credential_id }
 
-                        def credentialId = "acr-cred"
+                    if (!existing) {
+                        def username =  sh (
+                            script: 'terraform output -raw acr_username',
+                            returnStdout: true
+                        ).trim()
+                        def password = sh (
+                            script: 'terraform output -raw acr_password',
+                            returnStdout: true
+                        ).trim()
+                        def description = "Service principal credentials for connection to container registry deployed on azure"
+                        def credentials = new UsernamePasswordCredentialsImpl(
+                            CredentialsScope.GLOBAL,
+                            credentialId,
+                            description,
+                            username,
+                            password
+                        )
 
-                        def existing = com.cloudbees.plugins.credentials.CredentialsProvider.lookupCredentials(
-                            com.cloudbees.plugins.credentials.common.StandardCredentials.class,
-                            Jenkins.instance,
-                            null,
-                            null
-                        ).find { it.id == credential_id }
-
-                        if (!existing) {
-                            def username =  sh (
-                                script: 'terraform output -raw acr_username',
-                                returnStdout: true
-                            ).trim()
-                            def password = sh (
-                                script: 'terraform output -raw acr_password',
-                                returnStdout: true
-                            ).trim()
-                            def description = "Service principal credentials for connection to container registry deployed on azure"
-                            def credentials = new UsernamePasswordCredentialsImpl(
-                                CredentialsScope.GLOBAL,
-                                credentialId,
-                                description,
-                                username,
-                                password
-                            )
-
-                            SystemCredentialsProvider.getInstance().getStore().addCredentials(Domain.global(), credentials)
-                            SystemCredentialsProvider.getInstance().save()
-                            echo "Credential '${credentialId}' added."
-                        } else {
-                            echo "Credential '${credentialId}' already exists."
-                        }
-                   // }
+                        SystemCredentialsProvider.getInstance().getStore().addCredentials(Domain.global(), credentials)
+                        SystemCredentialsProvider.getInstance().save()
+                        echo "Credential '${credentialId}' added."
+                    } else {
+                        echo "Credential '${credentialId}' already exists."
+                    }
                 }
             }
         }
@@ -123,47 +119,45 @@ pipeline {
                 expression { params.Action == 'apply' }
             }
             steps {
-                withGroovy{
-                    //script {
-                        // import com.cloudbees.plugins.credentials.*
-                        // import com.cloudbees.plugins.credentials.domains.*
-                        // import com.cloudbees.plugins.credentials.impl.*
-                        // import jenkins.model.*
+                script {
+                    // import com.cloudbees.plugins.credentials.*
+                    // import com.cloudbees.plugins.credentials.domains.*
+                    // import com.cloudbees.plugins.credentials.impl.*
+                    // import jenkins.model.*
 
-                        def credentialId = "deploy-group-cred"
+                    def credentialId = "deploy-group-cred"
 
-                        def existing = com.cloudbees.plugins.credentials.CredentialsProvider.lookupCredentials(
-                            com.cloudbees.plugins.credentials.common.StandardCredentials.class,
-                            Jenkins.instance,
-                            null,
-                            null
-                        ).find { it.id == credential_id }
+                    def existing = com.cloudbees.plugins.credentials.CredentialsProvider.lookupCredentials(
+                        com.cloudbees.plugins.credentials.common.StandardCredentials.class,
+                        Jenkins.instance,
+                        null,
+                        null
+                    ).find { it.id == credential_id }
 
-                        if (!existing) {
-                            def username = sh (
-                                script: 'terraform output -raw instance_username',
-                                returnStdout: true
-                            ).trim()
-                            def password = sh (
-                                script: 'terraform output -raw instance_password',
-                                returnStdout: true
-                            ).trim()
-                            def description = "Service principal credentials for connection to container registry deployed on azure"
-                            def credentials = new UsernamePasswordCredentialsImpl(
-                                CredentialsScope.GLOBAL,
-                                credentialId,
-                                description,
-                                username,
-                                password
-                            )
+                    if (!existing) {
+                        def username = sh (
+                            script: 'terraform output -raw instance_username',
+                            returnStdout: true
+                        ).trim()
+                        def password = sh (
+                            script: 'terraform output -raw instance_password',
+                            returnStdout: true
+                        ).trim()
+                        def description = "Service principal credentials for connection to container registry deployed on azure"
+                        def credentials = new UsernamePasswordCredentialsImpl(
+                            CredentialsScope.GLOBAL,
+                            credentialId,
+                            description,
+                            username,
+                            password
+                        )
 
-                            SystemCredentialsProvider.getInstance().getStore().addCredentials(Domain.global(), credentials)
-                            SystemCredentialsProvider.getInstance().save()
-                            echo "Credential '${credentialId}' added."
-                        } else {
-                            echo "Credential '${credentialId}' already exists."
-                        }
-                    //}
+                        SystemCredentialsProvider.getInstance().getStore().addCredentials(Domain.global(), credentials)
+                        SystemCredentialsProvider.getInstance().save()
+                        echo "Credential '${credentialId}' added."
+                    } else {
+                        echo "Credential '${credentialId}' already exists."
+                    }
                 }
             }
         }
