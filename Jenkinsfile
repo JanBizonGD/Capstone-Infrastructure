@@ -74,7 +74,7 @@ pipeline {
             }
             steps {
                 withGroovy{
-                    script {
+                    //script {
                         import com.cloudbees.plugins.credentials.*
                         import com.cloudbees.plugins.credentials.domains.*
                         import com.cloudbees.plugins.credentials.impl.*
@@ -113,7 +113,7 @@ pipeline {
                         } else {
                             echo "Credential '${credentialId}' already exists."
                         }
-                    }
+                   // }
                 }
             }
         }
@@ -123,7 +123,7 @@ pipeline {
             }
             steps {
                 withGroovy{
-                    script {
+                    //script {
                         import com.cloudbees.plugins.credentials.*
                         import com.cloudbees.plugins.credentials.domains.*
                         import com.cloudbees.plugins.credentials.impl.*
@@ -162,7 +162,7 @@ pipeline {
                         } else {
                             echo "Credential '${credentialId}' already exists."
                         }
-                    }
+                    //}
                 }
             }
         }
