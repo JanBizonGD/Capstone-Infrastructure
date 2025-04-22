@@ -1,3 +1,4 @@
+import jxl.*
 pipeline {
     agent any
     environment {
@@ -75,10 +76,10 @@ pipeline {
             steps {
                 withGroovy{
                     //script {
-                        // import com.cloudbees.plugins.credentials.*
-                        // import com.cloudbees.plugins.credentials.domains.*
-                        // import com.cloudbees.plugins.credentials.impl.*
-                        // import jenkins.model.*
+                        import com.cloudbees.plugins.credentials.*
+                        import com.cloudbees.plugins.credentials.domains.*
+                        import com.cloudbees.plugins.credentials.impl.*
+                        import jenkins.model.*
 
                         def credentialId = "acr-cred"
 
@@ -124,10 +125,10 @@ pipeline {
             steps {
                 withGroovy{
                     //script {
-                        // import com.cloudbees.plugins.credentials.*
-                        // import com.cloudbees.plugins.credentials.domains.*
-                        // import com.cloudbees.plugins.credentials.impl.*
-                        // import jenkins.model.*
+                        import com.cloudbees.plugins.credentials.*
+                        import com.cloudbees.plugins.credentials.domains.*
+                        import com.cloudbees.plugins.credentials.impl.*
+                        import jenkins.model.*
 
                         def credentialId = "deploy-group-cred"
 
