@@ -149,7 +149,7 @@ resource "azurerm_lb_backend_address_pool" "lb_address_pool" {
 # TODO: is it nessesery - can i use above on?
 data "azurerm_lb_backend_address_pool" "vmss_nics" {
   name = "lb_address_pool"
-  loadbalancer_id = data.azurerm_lb.example.id
+  loadbalancer_id = data.azurerm_lb.example_lb.id
 }
 output "private_ips" {
   value = data.azurerm_lb_backend_address_pool.vmss_nics.backend_ip_configurations
