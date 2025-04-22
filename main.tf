@@ -235,8 +235,8 @@ resource "azurerm_network_security_group" "nsg" {
 # Database
 resource "azurerm_mssql_server" "my_sql_server" {
   name                         = "petclinic-sqlserver"
-  resource_group_name          = azurerm_resource_group.rg.name
-  location                     = azurerm_resource_group.rg.location
+  resource_group_name          = data.azurerm_resource_group.rg.name
+  location                     = data.azurerm_resource_group.rg.location
   version                      = "12.0"
   administrator_login          = "azureuser"
   administrator_login_password = "Password123!"
