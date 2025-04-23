@@ -261,3 +261,6 @@ resource "azurerm_mssql_database" "my_sql_database" {
     prevent_destroy = true
   }
 }
+output "sql_uri" {
+  value = azurerm_mssql_server.my_sql_server.fully_qualified_domain_name
+}
