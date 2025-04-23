@@ -152,8 +152,16 @@ data "azurerm_lb_backend_address_pool" "vmss_nics" {
 
   depends_on = [ azurerm_lb_backend_address_pool.lb_address_pool ]
 }
+
+data "azurerm_linux_virtual_machine_scale_set" "vmss" {
+  name = azurerm_linux_virtual_machine_scale_set.vmss.name
+  resource_group_name = zurerm_linux_virtual_machine_scale_set.vmss.resource_group_name
+
+  depends_on = [ azurerm_linux_virtual_machine_scale_set.vmss ]
+}
+
 output "private_ips" {
-  value = [ data.azurerm_lb_backend_address_pool.vmss_nics.backend_ip_configurations[0].private_ip_addresses ]
+  value = data.azurerm_linux_virtual_machine_scale_set.vmss.instances.*.private_ip_address
   //value = [ data.azurerm_lb_backend_address_pool.vmss_nics.backend_address[*].ip_address ]
 }
 
