@@ -153,7 +153,8 @@ data "azurerm_lb_backend_address_pool" "vmss_nics" {
   depends_on = [ azurerm_lb_backend_address_pool.lb_address_pool ]
 }
 output "private_ips" {
-  value = [ data.azurerm_lb_backend_address_pool.vmss_nics.backend_address[*].ip_address ]
+  value = [ data.azurerm_lb_backend_address_pool.vmss_nics.backend_ip_configurations[0].private_ip_addresses ]
+  //value = [ data.azurerm_lb_backend_address_pool.vmss_nics.backend_address[*].ip_address ]
 }
 
 
