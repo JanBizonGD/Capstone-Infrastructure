@@ -78,7 +78,7 @@ pipeline {
             }
             steps {
                 script {
-                    def ips = sh(script: 'terraform output -raw private_ips', returnStdout: true).trim()
+                    def ips = sh(script: 'terraform output -json private_ips', returnStdout: true).trim()
                     def uris = sh(script: 'terraform output -raw sql_uri', returnStdout: true).trim()
                     writeFile file: 'deploy-info.txt', text: "IPs=${ips}\nURIs=${uris}"
                 }
