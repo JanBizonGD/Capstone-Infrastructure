@@ -162,7 +162,6 @@ data "azurerm_virtual_machine_scale_set" "vmss" {
 
 output "private_ips" {
   value = data.azurerm_virtual_machine_scale_set.vmss.instances.*.private_ip_address
-  //value = [ data.azurerm_lb_backend_address_pool.vmss_nics.backend_address[*].ip_address ]
 }
 
 
@@ -196,6 +195,9 @@ resource "azurerm_public_ip" "lb_public_ip" {
   resource_group_name = data.azurerm_resource_group.rg.name
   allocation_method   = "Static"
   #sku                  = "Basic"
+}
+output "lb_ip" {
+  value = azurerm_public_ip.lb_public_ip.ip_address
 }
 
 # Step 8: Define firewall rules for accessing load balancer from limited IP addresses

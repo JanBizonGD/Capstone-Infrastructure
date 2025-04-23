@@ -80,7 +80,8 @@ pipeline {
                 script {
                     def ips = sh(script: 'terraform output -json private_ips', returnStdout: true).trim()
                     def uris = sh(script: 'terraform output -raw sql_uri', returnStdout: true).trim()
-                    writeFile file: 'deploy-info.txt', text: "IPs=${ips}\nURIs=${uris}"
+                    def lb_ip = sh(script: 'terraform output -raw lb_ip', returnStdout: true).trim()
+                    writeFile file: 'deploy-info.txt', text: "IPs=${ips}\nURIs=${uris}\nLB_IP=${lb_ip}"
                 }
                 archiveArtifacts artifacts: 'deploy-info.txt', fingerprint: true
             }
@@ -187,5 +188,3 @@ pipeline {
         }
     }
 }
-
-// TODO: 'terraform output -raw private_ips'
