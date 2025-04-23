@@ -146,13 +146,14 @@ resource "azurerm_lb_backend_address_pool" "lb_address_pool" {
   name = "lb_address_pool"
 }
 
-# TODO: is it nessesery - can i use above on?
-# data "azurerm_lb_backend_address_pool" "vmss_nics" {
-#   name = "lb_address_pool"
-#   loadbalancer_id = azurerm_lb.example_lb.id
-# }
+data "azurerm_lb_backend_address_pool" "vmss_nics" {
+  name = "lb_address_pool"
+  loadbalancer_id = azurerm_lb.example_lb.id
+
+  depends_on = [ azurerm_lb_backend_address_pool.lb_address_pool ]
+}
 output "private_ips" {
-  value = [ azurerm_lb_backend_address_pool.lb_address_pool.backend_address[*].ip_address ]
+  value = [ azurerm_lb_backend_address_pool.vmss_nics.backend_address[*].ip_address ]
 }
 
 
