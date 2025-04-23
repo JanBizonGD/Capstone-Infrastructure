@@ -287,11 +287,11 @@ resource "azurerm_mysql_flexible_server" "my_sql_server" {
 resource "azurerm_mysql_flexible_database" "example" {
   name                = "petclinicdb"
   resource_group_name = data.azurerm_resource_group.rg.name
-  server_name         = data.azurerm_mysql_flexible_server.rg.name
+  server_name         = azurerm_mysql_flexible_server.my_sql_server.name
   charset             = "utf8"
   collation           = "utf8_unicode_ci"
 }
 
 output "sql_uri" {
-  value = azurerm_mssql_server.my_sql_server.fully_qualified_domain_name
+  value = azurerm_mysql_flexible_server.my_sql_server.fqdn
 }
