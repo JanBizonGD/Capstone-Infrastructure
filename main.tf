@@ -245,33 +245,53 @@ resource "azurerm_network_security_group" "nsg" {
 
 
 # Database
-resource "azurerm_mssql_server" "my_sql_server" {
-  name                         = "petclinic-sqlserver"
-  resource_group_name          = data.azurerm_resource_group.rg.name
-  location                     = data.azurerm_resource_group.rg.location
-  version                      = "12.0"
-  administrator_login          = "azureuser"
-  administrator_login_password = "Password123!"
+# resource "azurerm_mssql_server" "my_sql_server" {
+#   name                         = "petclinic-sqlserver"
+#   resource_group_name          = data.azurerm_resource_group.rg.name
+#   location                     = data.azurerm_resource_group.rg.location
+#   version                      = "12.0"
+#   administrator_login          = "azureuser"
+#   administrator_login_password = "Password123!"
+# }
+
+# resource "azurerm_mssql_database" "my_sql_database" {
+#   name         = "petclinic-db"
+#   server_id    = azurerm_mssql_server.my_sql_server.id
+#   collation    = "SQL_Latin1_General_CP1_CI_AS"
+#   license_type = "LicenseIncluded"
+#   max_size_gb  = 2
+#   sku_name     = "S0"
+#   enclave_type = "VBS"
+
+#   tags = {
+#     foo = "bar"
+#   }
+
+#   # prevent the possibility of accidental data loss
+#   lifecycle {
+#     prevent_destroy = true
+#   }
+# }
+
+
+resource "azurerm_mysql_flexible_server" "my_sql_server" {
+  name                   = "petclinic-sqlserver"
+  resource_group_name    = data.azurerm_resource_group.rg.name
+  location               = data.azurerm_resource_group.rg.location
+  administrator_login    = "azureuser"
+  administrator_password = "Password123!"
+  backup_retention_days  = 7
+  //sku_name               = "GP_Standard_D2ds_v4"
 }
 
-resource "azurerm_mssql_database" "my_sql_database" {
-  name         = "petclinic-db"
-  server_id    = azurerm_mssql_server.my_sql_server.id
-  collation    = "SQL_Latin1_General_CP1_CI_AS"
-  license_type = "LicenseIncluded"
-  max_size_gb  = 2
-  sku_name     = "S0"
-  enclave_type = "VBS"
-
-  tags = {
-    foo = "bar"
-  }
-
-  # prevent the possibility of accidental data loss
-  lifecycle {
-    prevent_destroy = true
-  }
+resource "azurerm_mysql_flexible_database" "example" {
+  name                = "petclinicdb"
+  resource_group_name = data.azurerm_resource_group.rg.name
+  server_name         = data.azurerm_mysql_flexible_server.rg.name
+  charset             = "utf8"
+  collation           = "utf8_unicode_ci"
 }
+
 output "sql_uri" {
   value = azurerm_mssql_server.my_sql_server.fully_qualified_domain_name
 }
