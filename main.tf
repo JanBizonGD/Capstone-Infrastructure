@@ -153,7 +153,7 @@ data "azurerm_lb_backend_address_pool" "vmss_nics" {
   depends_on = [ azurerm_lb_backend_address_pool.lb_address_pool ]
 }
 
-data "azurerm_linux_virtual_machine_scale_set" "vmss" {
+data "azurerm_virtual_machine_scale_set" "vmss" {
   name = azurerm_linux_virtual_machine_scale_set.vmss.name
   resource_group_name = zurerm_linux_virtual_machine_scale_set.vmss.resource_group_name
 
