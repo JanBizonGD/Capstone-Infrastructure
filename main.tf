@@ -58,7 +58,7 @@ output "acr_password" {
 }
 
 
-# Step 5: Create scale set with 3 instances using the custom image and load balancer
+# Create scale set with 3 instances using the custom image and load balancer
 resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
   name                = "vmss-example"
   resource_group_name = data.azurerm_resource_group.rg.name
@@ -78,8 +78,8 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
     sku       = "20_04-lts"
     version   = "latest"
   }
-  admin_username  = "adminuser"
-  admin_password  = "Password123!"
+  admin_username  = var.vm_username
+  admin_password  = var.vm_password
   disable_password_authentication = false
   overprovision   = true
 
@@ -100,9 +100,6 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
     }
   }
 
-# sudo apt update && apt install -y apache2
-# sudo systemctl start apache2
-# sudo systemctl enable apache2
   custom_data = base64encode(<<-EOT
 #!/bin/bash
 apt update && apt install -y docker
@@ -188,19 +185,18 @@ resource "azurerm_lb_rule" "lb_rule" {
 
 
 
-# Step 7: Create public IP for the load balancer
+# Create public IP for the load balancer
 resource "azurerm_public_ip" "lb_public_ip" {
   name                = "example-lb-ip"
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
   allocation_method   = "Static"
-  #sku                  = "Basic"
 }
 output "lb_ip" {
   value = azurerm_public_ip.lb_public_ip.ip_address
 }
 
-# Step 8: Define firewall rules for accessing load balancer from limited IP addresses
+# Define firewall rules for accessing load balancer from limited IP addresses
 resource "azurerm_network_security_group" "nsg" {
   name                = "example-nsg"
   location            = data.azurerm_resource_group.rg.location
@@ -243,45 +239,15 @@ resource "azurerm_network_security_group" "nsg" {
     }
 }
 
-
 # Database
-# resource "azurerm_mssql_server" "my_sql_server" {
-#   name                         = "petclinic-sqlserver"
-#   resource_group_name          = data.azurerm_resource_group.rg.name
-#   location                     = data.azurerm_resource_group.rg.location
-#   version                      = "12.0"
-#   administrator_login          = "azureuser"
-#   administrator_login_password = "Password123!"
-# }
-
-# resource "azurerm_mssql_database" "my_sql_database" {
-#   name         = "petclinic-db"
-#   server_id    = azurerm_mssql_server.my_sql_server.id
-#   collation    = "SQL_Latin1_General_CP1_CI_AS"
-#   license_type = "LicenseIncluded"
-#   max_size_gb  = 2
-#   sku_name     = "S0"
-#   enclave_type = "VBS"
-
-#   tags = {
-#     foo = "bar"
-#   }
-
-#   # prevent the possibility of accidental data loss
-#   lifecycle {
-#     prevent_destroy = true
-#   }
-# }
-
-
 resource "azurerm_mysql_flexible_server" "my_sql_server" {
   name                   = "petclinic-sqlserver"
   resource_group_name    = data.azurerm_resource_group.rg.name
   location               = data.azurerm_resource_group.rg.location
-  administrator_login    = "azureuser"
-  administrator_password = "Password123!"
+  administrator_login    = var.db_username
+  administrator_password = var.db_password
   backup_retention_days  = 7
-  sku_name               = "B_Standard_B1s" //"GP_Standard_D2ds_v4"
+  sku_name               = "B_Standard_B1s"
 }
 
 resource "azurerm_mysql_flexible_database" "example" {
