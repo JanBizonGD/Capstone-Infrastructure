@@ -6,8 +6,8 @@ pipeline {
     agent any
     environment {
         AZURE_CRED = credentials('azure-cred')
-        AZURE_CLIENT_ID='$AZURE_CRED_USR'
-        AZURE_CLIENT_SECRET='$AZURE_CRED_PSW'
+        AZURE_CLIENT_ID = AZURE_CRED_USR
+        AZURE_CLIENT_SECRET = AZURE_CRED_PSW
         TF_VAR_vm_username='adminuser'
         TF_VAR_vm_password='Password123!'
         TF_VAR_db_username='azureuser'
@@ -21,7 +21,7 @@ pipeline {
             steps {
                 sh 'echo INIT'
 
-                sh 'az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID'
+                sh 'az login --service-principal --username $AZURE_CRED_USR --password $AZURE_CRED_PSW --tenant $AZURE_TENANT_ID'
                 sh 'az account set --subscription $AZURE_SUBSCRIPTION_ID'
                 sh 'terraform init -input=false -backend-config="storage_account_name=$AZURE_STORAGE_ACCOUNT"'
             }
