@@ -6,8 +6,8 @@ pipeline {
     agent any
     environment {
         AZURE_CRED = credentials('azure-cred')
-        AZURE_CLIENT_ID = $AZURE_CRED_USR
-        AZURE_CLIENT_SECRET = $AZURE_CRED_PSW
+        AZURE_CLIENT_ID = "$AZURE_CRED_USR"
+        AZURE_CLIENT_SECRET = "$AZURE_CRED_PSW"
         TF_VAR_vm_username='adminuser'
         TF_VAR_vm_password='Password123!'
         TF_VAR_db_username='azureuser'
