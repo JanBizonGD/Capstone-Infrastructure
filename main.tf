@@ -9,8 +9,8 @@ terraform {
       use_cli = true
       use_azuread_auth = true
       storage_account_name = ""
-      container_name = "petclinicimage"
-      key   = "prod.terraform.tfstate"
+      container_name = var.azure_container_name
+      key   = var.state_file_name
   }
 }
 variable "resource_group_name" {
@@ -28,13 +28,13 @@ data "azurerm_resource_group" "rg" {
   name     = var.resource_group_name
 } 
 data "azurerm_virtual_network" "existing_vnet" {
-  name                = "jenkinsNetwork"
+  name                = var.network_name
   resource_group_name = data.azurerm_resource_group.rg.name
 }
 
 # Create a subnet in the existing VNet
 resource "azurerm_subnet" "deploy_subnet" {
-  name                 = "Deployment-subnet"
+  name                 = var.subnet_name
   resource_group_name  = data.azurerm_virtual_network.existing_vnet.resource_group_name
   virtual_network_name = data.azurerm_virtual_network.existing_vnet.name
   address_prefixes     = ["10.1.2.0/24"] 
@@ -42,7 +42,7 @@ resource "azurerm_subnet" "deploy_subnet" {
 
 
 resource "azurerm_container_registry" "acr" {
-  name                = "acrPetclinic1234"
+  name                = var.azure_container_registry_name
   resource_group_name = data.azurerm_resource_group.rg.name
   location            = data.azurerm_resource_group.rg.location
   sku                 = "Standard"
@@ -60,7 +60,7 @@ output "acr_password" {
 
 # Create scale set with 3 instances using the custom image and load balancer
 resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
-  name                = "vmss-example"
+  name                = var.vm_scale_set_name
   resource_group_name = data.azurerm_resource_group.rg.name
   location            = data.azurerm_resource_group.rg.location
 
@@ -88,12 +88,12 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
   }
 
   network_interface {
-    name                      = "primary-nic"
+    name                      = var.scale_set_interface_name
     primary                   = true
     network_security_group_id = azurerm_network_security_group.nsg.id
 
     ip_configuration {
-      name                          = "internal" # vm_network_config
+      name                          = "internal"
       primary   = true
       subnet_id                     = azurerm_subnet.deploy_subnet.id
       load_balancer_backend_address_pool_ids = [ azurerm_lb_backend_address_pool.lb_address_pool.id ]
@@ -128,11 +128,11 @@ output "instance_password" {
 
 # Create load balancer
 resource "azurerm_lb" "example_lb" {
-  name                = "example-lb"
+  name                = var.load_balancer_name
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
   frontend_ip_configuration {
-    name                                 = "loadbalancer-ip"
+    name                                 = var.lb_frontend_name
     public_ip_address_id                = azurerm_public_ip.lb_public_ip.id
   }
 }
@@ -140,11 +140,11 @@ resource "azurerm_lb" "example_lb" {
 # Other lb resources
 resource "azurerm_lb_backend_address_pool" "lb_address_pool" {
   loadbalancer_id = azurerm_lb.example_lb.id
-  name = "lb_address_pool"
+  name = var.lb_backend_pool_name
 }
 
 data "azurerm_lb_backend_address_pool" "vmss_nics" {
-  name = "lb_address_pool"
+  name = var.lb_backend_pool_name
   loadbalancer_id = azurerm_lb.example_lb.id
 
   depends_on = [ azurerm_lb_backend_address_pool.lb_address_pool ]
@@ -164,7 +164,7 @@ output "private_ips" {
 
 resource "azurerm_lb_probe" "lb_probe" {
   loadbalancer_id = azurerm_lb.example_lb.id
-  name                = "example-probe"
+  name                = var.lb_probe_name
   protocol            = "Http"
   port                = 80
   request_path        = "/"
@@ -174,11 +174,11 @@ resource "azurerm_lb_probe" "lb_probe" {
 
 resource "azurerm_lb_rule" "lb_rule" {
   loadbalancer_id = azurerm_lb.example_lb.id
-  name                           = "example-lb-rule"
+  name                           = var.lb_rule_name
   protocol                       = "Tcp"
   frontend_port                  = 80
   backend_port                   = 80
-  frontend_ip_configuration_name = "loadbalancer-ip"
+  frontend_ip_configuration_name = var.lb_frontend_name
   backend_address_pool_ids       = [ azurerm_lb_backend_address_pool.lb_address_pool.id ]
   probe_id                       = azurerm_lb_probe.lb_probe.id
 }
@@ -187,7 +187,7 @@ resource "azurerm_lb_rule" "lb_rule" {
 
 # Create public IP for the load balancer
 resource "azurerm_public_ip" "lb_public_ip" {
-  name                = "example-lb-ip"
+  name                = var.lb_public_ip_name
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
   allocation_method   = "Static"
@@ -198,7 +198,7 @@ output "lb_ip" {
 
 # Define firewall rules for accessing load balancer from limited IP addresses
 resource "azurerm_network_security_group" "nsg" {
-  name                = "example-nsg"
+  name                = var.nsg_name
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
 
@@ -241,7 +241,7 @@ resource "azurerm_network_security_group" "nsg" {
 
 # Database
 resource "azurerm_mysql_flexible_server" "my_sql_server" {
-  name                   = "petclinic-sqlserver"
+  name                   = var.mysql_server_name
   resource_group_name    = data.azurerm_resource_group.rg.name
   location               = data.azurerm_resource_group.rg.location
   administrator_login    = var.db_username
@@ -251,7 +251,7 @@ resource "azurerm_mysql_flexible_server" "my_sql_server" {
 }
 
 resource "azurerm_mysql_flexible_database" "example" {
-  name                = "petclinicdb"
+  name                = var.mysql_db_name
   resource_group_name = data.azurerm_resource_group.rg.name
   server_name         = azurerm_mysql_flexible_server.my_sql_server.name
   charset             = "utf8"
