@@ -14,14 +14,14 @@ variable "db_password" {
   type = string
   sensitive = true
 }
-variable "azure_container_name" {
-  type = string
-  default = "petclinicimage"
-}
-variable "state_file_name" {
-  type = string
-  default = "prod.terraform.tfstate"
-}
+# variable "azure_container_name" {
+#   type = string
+#   default = 
+# }
+# variable "state_file_name" {
+#   type = string
+#   default = 
+# }
 variable "network_name" {
   type = string
   default = "jenkinsNetwork"

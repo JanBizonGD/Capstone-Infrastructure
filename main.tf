@@ -9,8 +9,8 @@ terraform {
       use_cli = true
       use_azuread_auth = true
       storage_account_name = ""
-      container_name = var.azure_container_name
-      key   = var.state_file_name
+      container_name = "petclinicimage" //var.azure_container_name
+      key   = "prod.terraform.tfstate" //var.state_file_name
   }
 }
 variable "resource_group_name" {
