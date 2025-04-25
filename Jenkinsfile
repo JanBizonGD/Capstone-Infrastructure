@@ -8,10 +8,12 @@ pipeline {
         AZURE_CRED = credentials('azure-cred')
         AZURE_CLIENT_ID = "$AZURE_CRED_USR"
         AZURE_CLIENT_SECRET = "$AZURE_CRED_PSW"
-        TF_VAR_vm_username='adminuser' // credentials('azure-cred')
-        TF_VAR_vm_password='Password123!'
-        TF_VAR_db_username='azureuser'  // credentials('azure-cred')
-        TF_VAR_db_password='Password123!'
+        VM_CRED = credentials('vm-cred')
+        TF_VAR_vm_username = "$VM_CRED_USR"
+        TF_VAR_vm_password = "$VM_CRED_PSW"
+        DB_CRED = credentials('db-cred')
+        TF_VAR_db_username = "$DB_CRED_USR"
+        TF_VAR_db_password = "$DB_CRED_PSW"
     }
     stages {
         stage('Loggin'){
@@ -132,48 +134,48 @@ pipeline {
                 }
             }
         }
-        stage('Add Instance Credential') {
-            when {
-                expression { params.Action == 'apply' }
-            }
-            steps {
-                script {
-                    def credentialId = "deploy-group-cred"
+        // stage('Add Instance Credential') {
+        //     when {
+        //         expression { params.Action == 'apply' }
+        //     }
+        //     steps {
+        //         script {
+        //             def credentialId = "deploy-group-cred"
 
-                    def existing = com.cloudbees.plugins.credentials.CredentialsProvider.lookupCredentials(
-                        com.cloudbees.plugins.credentials.common.StandardCredentials.class,
-                        Jenkins.instance,
-                        null,
-                        null
-                    ).find { it.id == credentialId }
+        //             def existing = com.cloudbees.plugins.credentials.CredentialsProvider.lookupCredentials(
+        //                 com.cloudbees.plugins.credentials.common.StandardCredentials.class,
+        //                 Jenkins.instance,
+        //                 null,
+        //                 null
+        //             ).find { it.id == credentialId }
 
-                    if (!existing) {
-                        def username = sh (
-                            script: 'terraform output -raw instance_username',
-                            returnStdout: true
-                        ).trim()
-                        def password = sh (
-                            script: 'terraform output -raw instance_password',
-                            returnStdout: true
-                        ).trim()
-                        def description = "Service principal credentials for connection to container registry deployed on azure"
-                        def credentials = new UsernamePasswordCredentialsImpl(
-                            CredentialsScope.GLOBAL,
-                            credentialId,
-                            description,
-                            username,
-                            password
-                        )
+        //             if (!existing) {
+        //                 def username = sh (
+        //                     script: 'terraform output -raw instance_username',
+        //                     returnStdout: true
+        //                 ).trim()
+        //                 def password = sh (
+        //                     script: 'terraform output -raw instance_password',
+        //                     returnStdout: true
+        //                 ).trim()
+        //                 def description = "Service principal credentials for connection to container registry deployed on azure"
+        //                 def credentials = new UsernamePasswordCredentialsImpl(
+        //                     CredentialsScope.GLOBAL,
+        //                     credentialId,
+        //                     description,
+        //                     username,
+        //                     password
+        //                 )
 
-                        SystemCredentialsProvider.getInstance().getStore().addCredentials(Domain.global(), credentials)
-                        SystemCredentialsProvider.getInstance().save()
-                        echo "Credential '${credentialId}' added."
-                    } else {
-                        echo "Credential '${credentialId}' already exists."
-                    }
-                }
-            }
-        }
+        //                 SystemCredentialsProvider.getInstance().getStore().addCredentials(Domain.global(), credentials)
+        //                 SystemCredentialsProvider.getInstance().save()
+        //                 echo "Credential '${credentialId}' added."
+        //             } else {
+        //                 echo "Credential '${credentialId}' already exists."
+        //             }
+        //         }
+        //     }
+        // }
         stage('Destroy'){
             when {
                 expression { params.Action == 'destroy' }
