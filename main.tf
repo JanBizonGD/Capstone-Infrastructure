@@ -116,13 +116,14 @@ EOT
 # Tabs may be a problem here
 
 }
-output "instance_username" {
-  value = azurerm_linux_virtual_machine_scale_set.vmss.admin_username
-}
-output "instance_password" {
-  value = azurerm_linux_virtual_machine_scale_set.vmss.admin_password
-  sensitive = true
-}
+# output "instance_username" {
+#   value = azurerm_linux_virtual_machine_scale_set.vmss.admin_username
+#   sensitive = true
+# }
+# output "instance_password" {
+#   value = azurerm_linux_virtual_machine_scale_set.vmss.admin_password
+#   sensitive = true
+# }
 
 
 
