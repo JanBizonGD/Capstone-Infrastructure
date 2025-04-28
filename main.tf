@@ -58,6 +58,20 @@ output "acr_password" {
 }
 
 
+
+
+resource "azurerm_lb_nat_pool" "lbnatpool" {
+  resource_group_name            = data.azurerm_resource_group.rg.name
+  name                           = "ssh"
+  loadbalancer_id                = azurerm_lb.example_lb.id
+  protocol                       = "Tcp"
+  frontend_port_start            = 50001
+  frontend_port_end              = 50003
+  backend_port                   = 22
+  frontend_ip_configuration_name = var.lb_frontend_name
+}
+
+
 # Create scale set with 3 instances using the custom image and load balancer
 resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
   name                = var.vm_scale_set_name
@@ -97,6 +111,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
       primary   = true
       subnet_id                     = azurerm_subnet.deploy_subnet.id
       load_balancer_backend_address_pool_ids = [ azurerm_lb_backend_address_pool.lb_address_pool.id ]
+      load_balancer_inbound_nat_rules_ids    = [azurerm_lb_nat_pool.lbnatpool.id]
     }
   }
 
@@ -267,7 +282,7 @@ output "sql_uri" {
 resource "azurerm_mysql_flexible_server_firewall_rule" "allow_specific_ip" {
   name                = var.mysql_rule_name
   resource_group_name = data.azurerm_resource_group.rg.name
-  server_name         = data.azurerm_mysql_flexible_server.rg.name
+  server_name         = azurerm_mysql_flexible_server.my_sql_server.name
   start_ip_address    = "10.1.2.0"
   end_ip_address      = "10.1.2.255"
 }
