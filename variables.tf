@@ -78,3 +78,7 @@ variable "mysql_db_name" {
   type = string
   default = "petclinicdb"
 }
+variable "mysql_rule_name" {
+  type = string
+  default = "AllowLocalBackend"
+}

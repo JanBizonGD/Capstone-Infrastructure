@@ -262,3 +262,12 @@ resource "azurerm_mysql_flexible_database" "example" {
 output "sql_uri" {
   value = azurerm_mysql_flexible_server.my_sql_server.fqdn
 }
+
+
+resource "azurerm_mysql_flexible_server_firewall_rule" "allow_specific_ip" {
+  name                = var.mysql_rule_name
+  resource_group_name = data.azurerm_resource_group.rg.name
+  server_name         = data.azurerm_mysql_flexible_server.rg.name
+  start_ip_address    = "10.1.2.0"
+  end_ip_address      = "10.1.2.255"
+}
