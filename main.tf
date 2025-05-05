@@ -78,6 +78,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
   resource_group_name = data.azurerm_resource_group.rg.name
   location            = data.azurerm_resource_group.rg.location
   depends_on = [ azurerm_lb_nat_pool.lbnatpool ]
+  overprovision = false
 
   instances = 3
 
@@ -96,7 +97,6 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
   admin_username  = var.vm_username
   admin_password  = var.vm_password
   disable_password_authentication = false
-  overprovision   = true
 
   tags = {
     environment = "production"
