@@ -339,7 +339,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "sql_dns_link" {
   name                  = "sql-dns-link"
   resource_group_name   = data.azurerm_resource_group.rg.name
   private_dns_zone_name = azurerm_private_dns_zone.sql_dns.name
-  virtual_network_id    = data.azurerm_virtual_network.vnet.id
+  virtual_network_id    = data.azurerm_virtual_network.existing_vnet.id
 }
 
 resource "azurerm_private_dns_a_record" "sql_dns_record" {
