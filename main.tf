@@ -77,6 +77,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
   name                = var.vm_scale_set_name
   resource_group_name = data.azurerm_resource_group.rg.name
   location            = data.azurerm_resource_group.rg.location
+  depends_on = [ azurerm_lb_nat_pool.lbnatpool ]
 
   instances = 3
 
@@ -113,6 +114,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
       load_balancer_backend_address_pool_ids = [ azurerm_lb_backend_address_pool.lb_address_pool.id ]
       load_balancer_inbound_nat_rules_ids    = [azurerm_lb_nat_pool.lbnatpool.id]
     }
+
   }
 
   custom_data = base64encode(<<-EOT
