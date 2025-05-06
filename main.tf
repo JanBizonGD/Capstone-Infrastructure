@@ -276,9 +276,19 @@ resource "azurerm_mysql_flexible_server" "my_sql_server" {
   administrator_login    = var.db_username
   administrator_password = var.db_password
   backup_retention_days  = 7
-  sku_name               = "B_Standard_B1s"
+  sku_name               = "GP_Standard_D2ds_v4"//"B_Standard_B1s"
   delegated_subnet_id = azurerm_subnet.deploy_subnet.id
   private_dns_zone_id    = azurerm_private_dns_zone.sql_dns.id
+  maintenance_window {
+    day_of_week  = 0
+    start_hour   = 8
+    start_minute = 0
+  }
+  storage {
+    iops    = 360
+    size_gb = 20
+  }
+  public_network_access_enabled = false
 
   depends_on = [azurerm_private_dns_zone_virtual_network_link.sql_dns_link]
 }
@@ -295,14 +305,6 @@ output "sql_uri" {
   value = azurerm_mysql_flexible_server.my_sql_server.fqdn
 }
 
-
-resource "azurerm_mysql_flexible_server_firewall_rule" "allow_specific_ip" {
-  name                = var.mysql_rule_name
-  resource_group_name = data.azurerm_resource_group.rg.name
-  server_name         = azurerm_mysql_flexible_server.my_sql_server.name
-  start_ip_address    = "10.1.2.0"
-  end_ip_address      = "10.1.2.255"
-}
 
 resource "azurerm_public_ip" "nat_ip" {
   name                = "nat-ip"
@@ -342,6 +344,10 @@ resource "azurerm_private_endpoint" "sql_pe" {
     private_connection_resource_id = azurerm_mysql_flexible_server.my_sql_server.id
     is_manual_connection           = false
     subresource_names              = ["sqlServer"]
+  }
+  private_dns_zone_group {
+    name                 = "dns-zone-group1"
+    private_dns_zone_ids = [azurerm_private_dns_zone.sql_dns.id]
   }
 }
 
