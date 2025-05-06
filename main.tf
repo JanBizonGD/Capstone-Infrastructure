@@ -277,6 +277,7 @@ resource "azurerm_mysql_flexible_server" "my_sql_server" {
   administrator_password = var.db_password
   backup_retention_days  = 7
   sku_name               = "B_Standard_B1s"
+  delegated_subnet_id = azurerm_subnet.deploy_subnet.id
   private_dns_zone_id    = azurerm_private_dns_zone.sql_dns.id
 
   depends_on = [azurerm_private_dns_zone_virtual_network_link.sql_dns_link]
