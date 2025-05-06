@@ -288,7 +288,6 @@ resource "azurerm_mysql_flexible_server" "my_sql_server" {
     iops    = 360
     size_gb = 20
   }
-  public_network_access_enabled = false
 
   depends_on = [azurerm_private_dns_zone_virtual_network_link.sql_dns_link]
 }
