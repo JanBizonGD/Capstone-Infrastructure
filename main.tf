@@ -331,7 +331,7 @@ resource "azurerm_private_endpoint" "sql_pe" {
 }
 
 resource "azurerm_private_dns_zone" "sql_dns" {
-  name                = "privatelink.database.windows.net"
+  name                = "privatelink.mysql.database.azure.com"
   resource_group_name = data.azurerm_resource_group.rg.name
 }
 
