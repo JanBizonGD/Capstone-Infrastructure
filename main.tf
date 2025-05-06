@@ -38,6 +38,17 @@ resource "azurerm_subnet" "deploy_subnet" {
   resource_group_name  = data.azurerm_virtual_network.existing_vnet.resource_group_name
   virtual_network_name = data.azurerm_virtual_network.existing_vnet.name
   address_prefixes     = ["10.1.2.0/24"] 
+  service_endpoints    = ["Microsoft.Storage"]
+
+  delegation {
+    name = "newsub"
+    service_delegation {
+      name = "Microsoft.DBforMySQL/flexibleServers"
+      actions = [
+        "Microsoft.Network/virtualNetworks/subnets/join/action",
+      ]
+    }
+  }
 }
 
 
@@ -316,19 +327,19 @@ resource "azurerm_subnet_nat_gateway_association" "nat_assoc" {
 
 
 # Private Endpoint
-# resource "azurerm_private_endpoint" "sql_pe" {
-#   name                = "sql-pe"
-#   location            = data.azurerm_resource_group.rg.location
-#   resource_group_name = data.azurerm_resource_group.rg.name
-#   subnet_id           = azurerm_subnet.deploy_subnet.id
+resource "azurerm_private_endpoint" "sql_pe" {
+  name                = "sql-pe"
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
+  subnet_id           = azurerm_subnet.deploy_subnet.id
 
-#   private_service_connection {
-#     name                           = "sql-privatesc"
-#     private_connection_resource_id = azurerm_mysql_flexible_server.my_sql_server.id
-#     is_manual_connection           = false
-#     subresource_names              = ["sqlServer"]
-#   }
-# }
+  private_service_connection {
+    name                           = "sql-privatesc"
+    private_connection_resource_id = azurerm_mysql_flexible_server.my_sql_server.id
+    is_manual_connection           = false
+    subresource_names              = ["sqlServer"]
+  }
+}
 
 resource "azurerm_private_dns_zone" "sql_dns" {
   name                = "privatelink.mysql.database.azure.com"
@@ -342,10 +353,10 @@ resource "azurerm_private_dns_zone_virtual_network_link" "sql_dns_link" {
   virtual_network_id    = data.azurerm_virtual_network.existing_vnet.id
 }
 
-# resource "azurerm_private_dns_a_record" "sql_dns_record" {
-#   name                = azurerm_mysql_flexible_server.my_sql_server.name
-#   zone_name           = azurerm_private_dns_zone.sql_dns.name
-#   resource_group_name = data.azurerm_resource_group.rg.name
-#   ttl                 = 300
-#   records             = [azurerm_private_endpoint.sql_pe.private_service_connection[0].private_ip_address]
-# }
+resource "azurerm_private_dns_a_record" "sql_dns_record" {
+  name                = azurerm_mysql_flexible_server.my_sql_server.name
+  zone_name           = azurerm_private_dns_zone.sql_dns.name
+  resource_group_name = data.azurerm_resource_group.rg.name
+  ttl                 = 300
+  records             = [azurerm_private_endpoint.sql_pe.private_service_connection[0].private_ip_address]
+}
