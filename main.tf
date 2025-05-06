@@ -330,22 +330,22 @@ resource "azurerm_subnet_nat_gateway_association" "nat_assoc" {
 #   }
 # }
 
-# resource "azurerm_private_dns_zone" "sql_dns" {
-#   name                = "privatelink.mysql.database.azure.com"
-#   resource_group_name = data.azurerm_resource_group.rg.name
-# }
+resource "azurerm_private_dns_zone" "sql_dns" {
+  name                = "privatelink.mysql.database.azure.com"
+  resource_group_name = data.azurerm_resource_group.rg.name
+}
 
-# resource "azurerm_private_dns_zone_virtual_network_link" "sql_dns_link" {
-#   name                  = "sql-dns-link"
-#   resource_group_name   = data.azurerm_resource_group.rg.name
-#   private_dns_zone_name = azurerm_private_dns_zone.sql_dns.name
-#   virtual_network_id    = data.azurerm_virtual_network.existing_vnet.id
-# }
+resource "azurerm_private_dns_zone_virtual_network_link" "sql_dns_link" {
+  name                  = "sql-dns-link"
+  resource_group_name   = data.azurerm_resource_group.rg.name
+  private_dns_zone_name = azurerm_private_dns_zone.sql_dns.name
+  virtual_network_id    = data.azurerm_virtual_network.existing_vnet.id
+}
 
-# resource "azurerm_private_dns_a_record" "sql_dns_record" {
-#   name                = azurerm_mysql_flexible_server.my_sql_server.name
-#   zone_name           = azurerm_private_dns_zone.sql_dns.name
-#   resource_group_name = data.azurerm_resource_group.rg.name
-#   ttl                 = 300
-#   records             = [azurerm_private_endpoint.sql_pe.private_service_connection[0].private_ip_address]
-# }
+resource "azurerm_private_dns_a_record" "sql_dns_record" {
+  name                = azurerm_mysql_flexible_server.my_sql_server.name
+  zone_name           = azurerm_private_dns_zone.sql_dns.name
+  resource_group_name = data.azurerm_resource_group.rg.name
+  ttl                 = 300
+  records             = [azurerm_private_endpoint.sql_pe.private_service_connection[0].private_ip_address]
+}
