@@ -40,23 +40,6 @@ resource "azurerm_subnet" "deploy_subnet" {
   address_prefixes     = ["10.1.2.0/24"] 
 }
 
-# resource "azurerm_subnet" "endpoint_subnet" {
-#   name                 = var.subnet_name
-#   resource_group_name  = data.azurerm_virtual_network.existing_vnet.resource_group_name
-#   virtual_network_name = data.azurerm_virtual_network.existing_vnet.name
-#   address_prefixes     = ["10.1.3.0/24"] 
-#   # service_endpoints    = ["Microsoft.Storage"]
-
-#   delegation {
-#     name = "newsub"
-#     service_delegation {
-#       name = "Microsoft.DBforMySQL/flexibleServers"
-#       actions = [
-#         "Microsoft.Network/virtualNetworks/subnets/join/action",
-#       ]
-#     }
-#   }
-# }
 
 resource "azurerm_container_registry" "acr" {
   name                = var.azure_container_registry_name
@@ -150,14 +133,7 @@ EOT
 # Tabs may be a problem here
 
 }
-# output "instance_username" {
-#   value = azurerm_linux_virtual_machine_scale_set.vmss.admin_username
-#   sensitive = true
-# }
-# output "instance_password" {
-#   value = azurerm_linux_virtual_machine_scale_set.vmss.admin_password
-#   sensitive = true
-# }
+
 
 
 
@@ -283,8 +259,7 @@ resource "azurerm_mysql_flexible_server" "my_sql_server" {
   administrator_password = var.db_password
   backup_retention_days  = 7
   sku_name               = "GP_Standard_D2ds_v4"//"B_Standard_B1s"
-  //delegated_subnet_id = azurerm_subnet.deploy_subnet.id
-  //private_dns_zone_id    = azurerm_private_dns_zone.sql_dns.id
+
   maintenance_window {
     day_of_week  = 0
     start_hour   = 8
@@ -369,11 +344,3 @@ resource "azurerm_private_dns_zone_virtual_network_link" "sql_dns_link" {
 
   depends_on = [ azurerm_subnet.deploy_subnet ]
 }
-
-# resource "azurerm_private_dns_a_record" "sql_dns_record" {
-#   name                = azurerm_mysql_flexible_server.my_sql_server.name
-#   zone_name           = azurerm_private_dns_zone.sql_dns.name
-#   resource_group_name = data.azurerm_resource_group.rg.name
-#   ttl                 = 300
-#   records             = [azurerm_private_endpoint.sql_pe.private_service_connection[0].private_ip_address]
-# }
