@@ -38,17 +38,17 @@ resource "azurerm_subnet" "deploy_subnet" {
   resource_group_name  = data.azurerm_virtual_network.existing_vnet.resource_group_name
   virtual_network_name = data.azurerm_virtual_network.existing_vnet.name
   address_prefixes     = ["10.1.2.0/24"] 
-  service_endpoints    = ["Microsoft.Storage"]
+  # service_endpoints    = ["Microsoft.Storage"]
 
-  delegation {
-    name = "newsub"
-    service_delegation {
-      name = "Microsoft.DBforMySQL/flexibleServers"
-      actions = [
-        "Microsoft.Network/virtualNetworks/subnets/join/action",
-      ]
-    }
-  }
+  # delegation {
+  #   name = "newsub"
+  #   service_delegation {
+  #     name = "Microsoft.DBforMySQL/flexibleServers"
+  #     actions = [
+  #       "Microsoft.Network/virtualNetworks/subnets/join/action",
+  #     ]
+  #   }
+  # }
 }
 
 
