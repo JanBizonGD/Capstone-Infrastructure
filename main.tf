@@ -342,7 +342,7 @@ resource "azurerm_private_endpoint" "sql_pe" {
     name                           = "sql-privatesc"
     private_connection_resource_id = azurerm_mysql_flexible_server.my_sql_server.id
     is_manual_connection           = false
-    subresource_names              = ["sqlServer"]
+    subresource_names              = ["mysqlServer"]
   }
   private_dns_zone_group {
     name                 = "dns-zone-group1"
@@ -360,12 +360,14 @@ resource "azurerm_private_dns_zone_virtual_network_link" "sql_dns_link" {
   resource_group_name   = data.azurerm_resource_group.rg.name
   private_dns_zone_name = azurerm_private_dns_zone.sql_dns.name
   virtual_network_id    = data.azurerm_virtual_network.existing_vnet.id
+
+  depends_on = [ azurerm_subnet.deploy_subnet ]
 }
 
-resource "azurerm_private_dns_a_record" "sql_dns_record" {
-  name                = azurerm_mysql_flexible_server.my_sql_server.name
-  zone_name           = azurerm_private_dns_zone.sql_dns.name
-  resource_group_name = data.azurerm_resource_group.rg.name
-  ttl                 = 300
-  records             = [azurerm_private_endpoint.sql_pe.private_service_connection[0].private_ip_address]
-}
+# resource "azurerm_private_dns_a_record" "sql_dns_record" {
+#   name                = azurerm_mysql_flexible_server.my_sql_server.name
+#   zone_name           = azurerm_private_dns_zone.sql_dns.name
+#   resource_group_name = data.azurerm_resource_group.rg.name
+#   ttl                 = 300
+#   records             = [azurerm_private_endpoint.sql_pe.private_service_connection[0].private_ip_address]
+# }
