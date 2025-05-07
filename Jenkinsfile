@@ -134,48 +134,6 @@ pipeline {
                 }
             }
         }
-        // stage('Add Instance Credential') {
-        //     when {
-        //         expression { params.Action == 'apply' }
-        //     }
-        //     steps {
-        //         script {
-        //             def credentialId = "deploy-group-cred"
-
-        //             def existing = com.cloudbees.plugins.credentials.CredentialsProvider.lookupCredentials(
-        //                 com.cloudbees.plugins.credentials.common.StandardCredentials.class,
-        //                 Jenkins.instance,
-        //                 null,
-        //                 null
-        //             ).find { it.id == credentialId }
-
-        //             if (!existing) {
-        //                 def username = sh (
-        //                     script: 'terraform output -raw instance_username',
-        //                     returnStdout: true
-        //                 ).trim()
-        //                 def password = sh (
-        //                     script: 'terraform output -raw instance_password',
-        //                     returnStdout: true
-        //                 ).trim()
-        //                 def description = "Service principal credentials for connection to container registry deployed on azure"
-        //                 def credentials = new UsernamePasswordCredentialsImpl(
-        //                     CredentialsScope.GLOBAL,
-        //                     credentialId,
-        //                     description,
-        //                     username,
-        //                     password
-        //                 )
-
-        //                 SystemCredentialsProvider.getInstance().getStore().addCredentials(Domain.global(), credentials)
-        //                 SystemCredentialsProvider.getInstance().save()
-        //                 echo "Credential '${credentialId}' added."
-        //             } else {
-        //                 echo "Credential '${credentialId}' already exists."
-        //             }
-        //         }
-        //     }
-        // }
         stage('Destroy'){
             when {
                 expression { params.Action == 'destroy' }
